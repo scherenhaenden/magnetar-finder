@@ -26,7 +26,10 @@ def open_external(db_id: int) -> Optional[sqlite3.Connection]:
     uri = f"file:{path}?mode=ro"
     conn = sqlite3.connect(uri, uri=True, check_same_thread=False)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
+    try:
+        conn.execute("PRAGMA journal_mode=WAL")
+    except sqlite3.OperationalError:
+        pass  # ignore attempt to write a readonly database WAL warning
     return conn
 
 

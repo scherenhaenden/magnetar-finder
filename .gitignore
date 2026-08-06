@@ -11,3 +11,6 @@ frontend-ng/.angular/
 frontend-ng/dist/
 builds/.pyinstaller/
 *.log
+.coverage
+.pytest_cache/
+htmlcov/

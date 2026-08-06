@@ -1,0 +1,18 @@
+# Magnetar Finder - Proyecto de Búsqueda y Análisis de Datos
+
+## Visión General
+Magnetar Finder es una herramienta avanzada de exploración de datos diseñada para buscar, filtrar y analizar información en múltiples bases de datos, comenzando con soporte para SQLite. La aplicación permite realizar búsquedas complejas (contiene, no contiene, combinaciones lógicas), filtros por fecha, y análisis de duplicados (uniques).
+
+## Funcionalidades Principales
+- **Búsqueda Avanzada**: Búsqueda por campos específicos con operadores lógicos (AND, OR, NOT).
+- **Filtros Temporales**: Selección de rangos de fecha precisos.
+- **Análisis de Antecedentes**: Selección de un registro para ver eventos previos ordenados cronológicamente.
+- **Agrupación por Unicidad**: Capacidad de agrupar registros basados en campos repetidos (ej. URLs) para identificar patrones.
+- **Gestión de Resultados**: Base de datos interna para guardar hallazgos.
+- **Enlazado y Notas**: Posibilidad de añadir notas y realizar "linking" entre hallazgos o grupos de hallazgos.
+- **Multi-DB**: Soporte inicial para SQLite con arquitectura preparada para múltiples motores de base de datos simultáneos.
+
+## Estructura del Proyecto
+- `/build`: Contiene la aplicación lista para ejecutar.
+- `/src`: Código fuente de la interfaz y lógica de búsqueda.
+- `README.md`: Documentación del proyecto.
