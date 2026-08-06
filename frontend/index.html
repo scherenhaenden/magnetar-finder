@@ -69,7 +69,7 @@
             "DEFAULT": "0.125rem",
             "lg":      "0.25rem",
             "xl":      "0.5rem",
-            "full":    "0.75rem",
+            "full":    "9999px",
           },
           spacing: {
             "gutter": "16px",
@@ -103,7 +103,7 @@
     <div class="px-6 py-6 border-b border-outline-variant/50">
       <div class="flex items-center gap-4 mb-6">
         <div class="w-10 h-10 rounded bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden">
-          <img alt="Researcher Profile" class="w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoDxUqDLCqHWvdZLywQ8cm36Z5fymQIx3m0DEo2eQ8lFLj3EWUPCC1G1C8oGcBWaWp36BzcHDJIue1y44bP1YsErDrtmEBFxpgEfj5ufot-spQ4nbXn5JQK5RyJiBb6lrFJ4VAjJSG6GQ90KnzDOJsVQ5o8KLbWLlL6P--870EjOtbEoIVPI122jxuIXEn7PQ09nKMcgP2sqvI_lFFLfGCruWh61VOVhol3g3BGHMI5N9M11_90Zx-"/>
+          <img alt="Researcher Profile" class="w-full h-full object-cover opacity-80" src="/assets/researcher-profile.svg"/>
         </div>
         <div>
           <h1 class="font-headline-md text-headline-md font-bold tracking-tight text-primary-fixed">Magnetar Finder</h1>
@@ -142,7 +142,7 @@
         <span class="material-symbols-outlined" style="font-size:18px">settings</span>
         <span>Settings</span>
       </a>
-      <a href="#" class="nav-link">
+      <a href="#support" class="nav-link" data-action="support">
         <span class="material-symbols-outlined" style="font-size:18px">help_outline</span>
         <span>Support</span>
       </a>
@@ -155,9 +155,9 @@
   <header class="fixed top-0 left-[280px] right-0 z-30 h-16 flex items-center justify-between px-8 border-b border-outline-variant bg-surface-dim/95 backdrop-blur-sm">
     <div class="flex items-center gap-6 h-full">
       <div id="topbar-tabs" class="flex items-center gap-1 h-full">
-        <a class="h-full flex items-center font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors px-3" href="#">Real-time</a>
-        <a class="h-full flex items-center font-label-caps text-label-caps text-primary-fixed border-b-2 border-primary-fixed font-bold opacity-80 transition-opacity px-3" href="#">History</a>
-        <a class="h-full flex items-center font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors px-3" href="#">Signals</a>
+        <a class="topbar-link h-full flex items-center font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors px-3" href="#exploration" data-view="exploration">Real-time</a>
+        <a class="topbar-link h-full flex items-center font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors px-3" href="#archives" data-view="archives">History</a>
+        <a class="topbar-link h-full flex items-center font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors px-3" href="#analysis" data-view="analysis">Signals</a>
       </div>
     </div>
     <div class="flex items-center gap-4">
@@ -170,18 +170,18 @@
         <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
       </button>
       <div class="flex items-center gap-1 border-l border-outline-variant pl-4">
-        <button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded transition-colors">
+        <button id="btn-notifications" type="button" aria-label="Notifications" title="Notifications" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded transition-colors">
           <span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
         </button>
-        <button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded transition-colors">
+        <button id="btn-sync" type="button" aria-label="Sync databases" title="Sync databases" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded transition-colors">
           <span class="material-symbols-outlined" style="font-size: 20px;">cloud_sync</span>
         </button>
-        <button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded transition-colors">
+        <button id="btn-help" type="button" aria-label="Help and support" title="Help and support" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded transition-colors">
           <span class="material-symbols-outlined" style="font-size: 20px;">help</span>
         </button>
       </div>
       <div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant ml-2">
-        <img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWWM3lUn5Mrj953Fxm99_SVAZ6lwyRvdB60sEOlmv5Xe3NPbCYTgUzrNQJDgkFrl5fQG4DpGKXvqDpOCQmhKDboQubFPqqGhtZHzbAopHdxhm8dArI_cfiwaa8JuE8iiD7K8jF89mjgGwh_CjrxhYegzJX9jl1KTc-7L88zLyy5PyxnaA5BhCEqzjKvOxKCMbilt81tIUyGP2P-UsHscFkWkgfzUMjcS-2fH5H4k-zznmi7W_2gZox"/>
+        <img alt="User Avatar" class="w-full h-full object-cover" src="/assets/researcher-profile.svg"/>
       </div>
     </div>
   </header>

@@ -80,6 +80,12 @@ function switchView(viewId) {
   document.querySelectorAll('.nav-link').forEach(a => {
     a.classList.toggle('active', a.dataset.view === viewId);
   });
+  document.querySelectorAll('.topbar-link').forEach(a => {
+    a.classList.toggle('text-primary-fixed', a.dataset.view === viewId);
+    a.classList.toggle('border-b-2', a.dataset.view === viewId);
+    a.classList.toggle('border-primary-fixed', a.dataset.view === viewId);
+    a.classList.toggle('font-bold', a.dataset.view === viewId);
+  });
   // Trigger data loads
   if (viewId === 'archives') loadArchives();
   if (viewId === 'databases') renderDbCards();
@@ -87,6 +93,13 @@ function switchView(viewId) {
 }
 
 document.querySelectorAll('.nav-link').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    if (a.dataset.action === 'support') return toast('Support documentation is not available yet.');
+    switchView(a.dataset.view);
+  });
+});
+document.querySelectorAll('.topbar-link').forEach(a => {
   a.addEventListener('click', e => { e.preventDefault(); switchView(a.dataset.view); });
 });
 
@@ -397,6 +410,9 @@ async function runSearch(offset = 0) {
 
 document.getElementById('btn-search')?.addEventListener('click', () => runSearch(0));
 document.getElementById('btn-execute')?.addEventListener('click', () => runSearch(0));
+document.getElementById('btn-notifications')?.addEventListener('click', () => toast('No new notifications.'));
+document.getElementById('btn-sync')?.addEventListener('click', () => { loadDatabases(); toast('Database list refreshed.', 'success'); });
+document.getElementById('btn-help')?.addEventListener('click', () => toast('Support documentation is not available yet.'));
 document.getElementById('btn-prev-page')?.addEventListener('click', () => runSearch(Math.max(0, State.searchOffset - State.searchLimit)));
 document.getElementById('btn-next-page')?.addEventListener('click', () => runSearch(State.searchOffset + State.searchLimit));
 

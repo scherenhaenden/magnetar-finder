@@ -13,6 +13,8 @@ Magnetar Finder es una herramienta avanzada de exploración de datos diseñada p
 - **Multi-DB**: Soporte inicial para SQLite con arquitectura preparada para múltiples motores de base de datos simultáneos.
 
 ## Estructura del Proyecto
-- `/build`: Contiene la aplicación lista para ejecutar.
-- `/src`: Código fuente de la interfaz y lógica de búsqueda.
+- `/app`: Backend Flask, API REST y gestión de conexiones SQLite.
+- `/frontend`: Interfaz web estática (HTML, CSS y JavaScript).
+- `/tests`: Pruebas API, consultas y verificación visual.
+- `/build`: Lanzadores y artefactos ejecutables generados.
 - `README.md`: Documentación del proyecto.
