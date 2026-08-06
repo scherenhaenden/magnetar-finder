@@ -65,10 +65,10 @@
                       "primary-container": "#00f2ff"
               },
               "borderRadius": {
-                      "DEFAULT": "0.25rem",
-                      "lg": "0.5rem",
-                      "xl": "0.75rem",
-                      "full": "9999px"
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
               },
               "spacing": {
                       "gutter": "16px",
@@ -174,9 +174,8 @@
       </style>
 </head>
 <body class="bg-background text-on-surface font-body-sm antialiased overflow-hidden">
-<details class="md:hidden fixed inset-x-0 top-0 z-50 bg-surface-container-lowest border-b border-outline-variant p-3 text-primary-fixed"><summary class="cursor-pointer font-label-caps text-label-caps">☰ Magnetar Finder — Menu</summary><div class="pt-3 flex flex-wrap gap-3"><a href="#exploration">Exploration</a><a href="#analysis">Analysis</a><a href="#archives">Archives</a><a href="#databases">Databases</a><button>Connect SQLite</button></div></details>
 <!-- SideNavBar (Database Active) -->
-<nav class="hidden md:flex w-[280px] h-screen flex-col border-r border-outline-variant bg-surface-container-lowest fixed left-0 top-0 bottom-0 z-40 overflow-y-auto">
+<nav class="w-[280px] h-screen flex flex-col border-r border-outline-variant bg-surface-container-lowest fixed left-0 top-0 bottom-0 z-40 overflow-y-auto">
 <div class="p-6">
 <h1 class="font-headline-md text-headline-md font-bold tracking-tight text-primary-fixed dark:text-primary-fixed">Magnetar Finder</h1>
 <p class="font-label-caps text-label-caps text-on-surface-variant mt-1">Precision Astrophysics</p>
@@ -228,7 +227,7 @@
 </div>
 </nav>
 <!-- TopAppBar -->
-<header class="hidden md:flex h-16 w-full border-b border-outline-variant bg-surface-dim/95 backdrop-blur-sm fixed top-0 right-0 left-[280px] z-30 items-center justify-between px-margin-desktop w-[calc(100%-280px)]">
+<header class="h-16 w-full border-b border-outline-variant bg-surface-dim/95 backdrop-blur-sm fixed top-0 right-0 left-[280px] z-30 flex items-center justify-between px-margin-desktop w-[calc(100%-280px)]">
 <div class="flex items-center gap-6">
 <div class="flex items-center bg-surface-container-highest border border-outline-variant rounded px-3 py-1.5 focus-within:border-primary-fixed-dim focus-within:ring-1 focus-within:ring-primary-fixed-dim transition-all">
 <span class="material-symbols-outlined text-on-surface-variant text-[18px]">search</span>
@@ -258,7 +257,7 @@
 </div>
 </header>
 <!-- Main Content Area -->
-<main class="ml-0 md:ml-[280px] mt-14 md:mt-16 p-4 md:p-margin-desktop h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] overflow-y-auto bg-surface flex gap-6">
+<main class="ml-[280px] mt-16 p-margin-desktop h-[calc(100vh-64px)] overflow-y-auto bg-surface flex gap-6">
 <!-- Left/Main Column: Databases & Saved Findings -->
 <div class="flex-1 flex flex-col gap-6">
 <!-- Database Management Section -->

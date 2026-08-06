@@ -77,15 +77,22 @@ function switchView(viewId) {
   document.querySelectorAll('.view').forEach(v => { v.classList.remove('active'); v.classList.add('hidden'); });
   const target = document.getElementById(`view-${viewId}`);
   if (target) { target.classList.remove('hidden'); target.classList.add('active'); }
+
   document.querySelectorAll('.nav-link').forEach(a => {
     a.classList.toggle('active', a.dataset.view === viewId);
   });
-  document.querySelectorAll('.topbar-link').forEach(a => {
-    a.classList.toggle('text-primary-fixed', a.dataset.view === viewId);
-    a.classList.toggle('border-b-2', a.dataset.view === viewId);
-    a.classList.toggle('border-primary-fixed', a.dataset.view === viewId);
-    a.classList.toggle('font-bold', a.dataset.view === viewId);
+
+  // Dynamically update TopBar tabs active state
+  document.querySelectorAll('.top-tab-link').forEach(a => {
+    const isActive = a.dataset.view === viewId;
+    a.classList.toggle('text-primary-fixed', isActive);
+    a.classList.toggle('border-b-2', isActive);
+    a.classList.toggle('border-primary-fixed', isActive);
+    a.classList.toggle('font-bold', isActive);
+    a.classList.toggle('opacity-80', isActive);
+    a.classList.toggle('text-on-surface-variant', !isActive);
   });
+
   // Trigger data loads
   if (viewId === 'archives') loadArchives();
   if (viewId === 'databases') renderDbCards();
@@ -93,14 +100,18 @@ function switchView(viewId) {
 }
 
 document.querySelectorAll('.nav-link').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    if (a.dataset.action === 'support') return toast('Support documentation is not available yet.');
-    switchView(a.dataset.view);
-  });
+  if (a.id !== 'nav-support') {
+    a.addEventListener('click', e => { e.preventDefault(); switchView(a.dataset.view); });
+  }
 });
-document.querySelectorAll('.topbar-link').forEach(a => {
+
+document.querySelectorAll('.top-tab-link').forEach(a => {
   a.addEventListener('click', e => { e.preventDefault(); switchView(a.dataset.view); });
+});
+
+document.getElementById('nav-support')?.addEventListener('click', e => {
+  e.preventDefault();
+  toast('Support channel online — Status: stable', 'success');
 });
 
 // ── Databases ──────────────────────────────────────────────────────────────────
@@ -410,9 +421,6 @@ async function runSearch(offset = 0) {
 
 document.getElementById('btn-search')?.addEventListener('click', () => runSearch(0));
 document.getElementById('btn-execute')?.addEventListener('click', () => runSearch(0));
-document.getElementById('btn-notifications')?.addEventListener('click', () => toast('No new notifications.'));
-document.getElementById('btn-sync')?.addEventListener('click', () => { loadDatabases(); toast('Database list refreshed.', 'success'); });
-document.getElementById('btn-help')?.addEventListener('click', () => toast('Support documentation is not available yet.'));
 document.getElementById('btn-prev-page')?.addEventListener('click', () => runSearch(Math.max(0, State.searchOffset - State.searchLimit)));
 document.getElementById('btn-next-page')?.addEventListener('click', () => runSearch(State.searchOffset + State.searchLimit));
 

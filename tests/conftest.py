@@ -5,9 +5,10 @@ import pytest
 from unittest import mock
 
 # Create directories and mock DB_PATH before app imports
-@pytest.fixture(autouse=True)
-def mock_db_path(tmp_path):
-    test_db_path = str(tmp_path / "test_magnetar_finder.db")
+@pytest.fixture(scope="session", autouse=True)
+def mock_db_path():
+    temp_dir = tempfile.mkdtemp()
+    test_db_path = os.path.join(temp_dir, "test_magnetar_finder.db")
 
     # Patch the DB_PATH inside results_db module
     with mock.patch("app.core.results_db.DB_PATH", test_db_path):

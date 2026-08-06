@@ -65,10 +65,10 @@
                       "primary-container": "#00f2ff"
               },
               "borderRadius": {
-                      "DEFAULT": "0.25rem",
-                      "lg": "0.5rem",
-                      "xl": "0.75rem",
-                      "full": "9999px"
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
               },
               "spacing": {
                       "gutter": "16px",
@@ -162,14 +162,13 @@
     </style>
 </head>
 <body class="bg-background text-on-background font-body-sm text-body-sm antialiased overflow-hidden">
-<details class="md:hidden fixed inset-x-0 top-0 z-50 bg-surface-container-lowest border-b border-outline-variant p-3 text-primary-fixed"><summary class="cursor-pointer font-label-caps text-label-caps">☰ Magnetar Finder — Menu</summary><div class="pt-3 flex flex-wrap gap-3"><a href="#exploration">Exploration</a><a href="#analysis">Analysis</a><a href="#archives">Archives</a><a href="#databases">Databases</a><button>Execute Query</button></div></details>
 <!--
         =======================================================================
         SHARED COMPONENT: SideNavBar
         Semantic Match: "Analysis" is strictly matched to the current page intent.
         =======================================================================
     -->
-<nav class="hidden md:flex fixed left-0 top-0 bottom-0 z-40 overflow-y-auto w-[280px] h-screen flex-col border-r border-outline-variant bg-surface-container-lowest text-primary-fixed-dim dark:bg-surface-container-lowest dark:text-primary-fixed-dim">
+<nav class="fixed left-0 top-0 bottom-0 z-40 overflow-y-auto w-[280px] h-screen flex flex-col border-r border-outline-variant bg-surface-container-lowest text-primary-fixed-dim dark:bg-surface-container-lowest dark:text-primary-fixed-dim">
 <!-- Header -->
 <div class="p-6 border-b border-outline-variant flex flex-col gap-4">
 <div class="flex items-center gap-3">
@@ -232,7 +231,7 @@
         Semantic Match: Secondary nav shell. None strictly active for this deeper tool.
         =======================================================================
     -->
-<header class="hidden md:flex fixed top-0 right-0 left-[280px] z-30 items-center justify-between px-margin-desktop h-16 w-full border-b border-outline-variant bg-surface-dim/95 backdrop-blur-sm dark:bg-surface-dim text-primary-fixed dark:text-primary-fixed">
+<header class="fixed top-0 right-0 left-[280px] z-30 flex items-center justify-between px-margin-desktop h-16 w-full border-b border-outline-variant bg-surface-dim/95 backdrop-blur-sm dark:bg-surface-dim text-primary-fixed dark:text-primary-fixed">
 <!-- Left: Search/Nav -->
 <div class="flex items-center gap-6">
 <!-- Brand missing from JSON config in this section but part of layout rules usually. Omitting to follow strict layout string. -->
@@ -268,7 +267,7 @@
         MAIN CANVAS
         =======================================================================
     -->
-<main class="ml-0 md:ml-[280px] pt-14 md:pt-16 h-screen overflow-hidden flex flex-col">
+<main class="ml-[280px] pt-16 h-screen overflow-hidden flex flex-col">
 <!-- Page Header & Global Controls -->
 <div class="px-margin-desktop py-6 border-b border-outline-variant bg-surface-container-lowest shrink-0">
 <div class="flex items-end justify-between">

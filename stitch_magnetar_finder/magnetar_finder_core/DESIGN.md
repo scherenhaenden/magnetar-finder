@@ -136,9 +136,9 @@ This design system employs a **12-column fluid grid** with a strict 4px base uni
 
 To maintain a grounded, scientific feel, this design system avoids traditional drop shadows. Depth is communicated through **Tonal Layering** and **Line Work**:
 
-- **Level 0 (Base):** `surface-container-lowest` (#080F10).
-- **Level 1 (Card/Section):** `surface-container` (#192122) with a 1px solid `outline-variant` border (#3A494B).
-- **Level 2 (Popovers/Modals):** `surface-container-high` (#232B2C) with a subtle `primary-fixed-dim` (#00DBE7) outer glow (2px blur, 10% opacity) to simulate active radiation.
+- **Level 0 (Base):** Deep Space Navy (#0B0E14).
+- **Level 1 (Card/Section):** Slate Surface (#161B22) with a 1px solid border (#334155).
+- **Level 2 (Popovers/Modals):** Lighter Surface (#1E293B) with a subtle Pulsar Cyan outer glow (2px blur, 10% opacity) to simulate active radiation.
 - **Interactive States:** Use "Interior Glows" (inner shadows) or stroke weight changes rather than lifting elements off the Z-axis. This keeps the UI feeling like a flat, precision instrument panel.
 
 ## Shapes

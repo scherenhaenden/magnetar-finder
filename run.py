@@ -8,7 +8,6 @@ import threading
 import webbrowser
 import os
 import sys
-import subprocess
 
 # Ensure the project root is on the path
 sys.path.insert(0, os.path.dirname(__file__))
@@ -49,11 +48,6 @@ def main():
         default="127.0.0.1",
         help="Host to bind to (default: 127.0.0.1)",
     )
-    parser.add_argument(
-        "--verify-ui",
-        action="store_true",
-        help="Run the Playwright UI verification against this server after startup",
-    )
     args = parser.parse_args()
 
     port = args.port if args.port else find_free_port(7474)
@@ -65,13 +59,6 @@ def main():
     if not args.no_browser:
         # Open the browser after a short delay to let Flask start
         threading.Timer(0.8, lambda: webbrowser.open(url)).start()
-
-    if args.verify_ui:
-        verification = os.path.join(os.path.dirname(__file__), "tests", "verify_ui.py")
-        threading.Timer(
-            1.0,
-            lambda: subprocess.run([sys.executable, verification, "--base-url", url], check=False),
-        ).start()
 
     app.run(host=args.host, port=port, debug=False, use_reloader=False)
 
