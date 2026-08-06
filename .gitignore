@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+data/magnetar_finder.db
+*.egg-info/
+.DS_Store
+design_preview/
+frontend-ng/node_modules/
+frontend-ng/.angular/
+frontend-ng/dist/
+builds/.pyinstaller/
+*.log

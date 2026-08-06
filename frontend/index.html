@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Magnetar Finder — Precision Data Explorer</title>
+  <meta name="description" content="Magnetar Finder: advanced multi-database SQLite explorer with filters, unique analysis, saved results and notes."/>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CDN (design system tokens from DESIGN.md) -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface":                   "#0d1515",
+            "surface-dim":               "#0d1515",
+            "surface-bright":            "#333b3b",
+            "surface-container-lowest":  "#080f10",
+            "surface-container-low":     "#151d1e",
+            "surface-container":         "#192122",
+            "surface-container-high":    "#232b2c",
+            "surface-container-highest": "#2e3637",
+            "on-surface":                "#dce4e4",
+            "on-surface-variant":        "#b9cacb",
+            "outline":                   "#849495",
+            "outline-variant":           "#3a494b",
+            "primary":                   "#e1fdff",
+            "primary-fixed":             "#74f5ff",
+            "primary-fixed-dim":         "#00dbe7",
+            "on-primary":                "#00363a",
+            "on-primary-fixed":          "#002022",
+            "primary-container":         "#00f2ff",
+            "on-primary-container":      "#006a71",
+            "secondary":                 "#b7c8e1",
+            "secondary-container":       "#3a4a5f",
+            "on-secondary-container":    "#a9bad3",
+            "tertiary":                  "#fff6e4",
+            "tertiary-container":        "#fed83a",
+            "tertiary-fixed-dim":        "#e8c423",
+            "inverse-surface":           "#dce4e4",
+            "inverse-on-surface":        "#2a3232",
+            "error":                     "#ffb4ab",
+            "error-container":           "#93000a",
+            "background":                "#0d1515",
+            "on-background":             "#dce4e4",
+          },
+          fontFamily: {
+            "headline": ["Geist", "sans-serif"],
+            "body":     ["Inter", "sans-serif"],
+            "mono":     ["JetBrains Mono", "monospace"],
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg":      "0.25rem",
+            "xl":      "0.5rem",
+            "full":    "9999px",
+          },
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="/css/app.css"/>
+</head>
+<body class="bg-background text-on-surface font-body antialiased overflow-hidden" style="font-size:14px;line-height:20px;">
+
+  <!-- ═══════════════════════════════════════════════════════
+       SIDE NAV
+  ═══════════════════════════════════════════════════════ -->
+  <nav id="sidenav" class="fixed left-0 top-0 bottom-0 z-40 w-[280px] flex flex-col border-r border-outline-variant bg-surface-container-lowest overflow-y-auto">
+    <!-- Header -->
+    <div class="px-6 py-5 border-b border-outline-variant">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded bg-surface-container-high border border-outline-variant flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-primary-fixed-dim" style="font-size:20px;font-variation-settings:'FILL' 1">hub</span>
+        </div>
+        <div>
+          <h1 class="font-headline font-bold text-[18px] leading-6 tracking-tight text-primary-fixed">Magnetar Finder</h1>
+          <p class="text-[11px] text-on-surface-variant font-body">Precision Data Explorer</p>
+        </div>
+      </div>
+      <button id="btn-new-analysis" class="w-full bg-primary-fixed-dim hover:bg-primary-fixed text-on-primary-fixed font-body font-bold text-[11px] uppercase tracking-widest py-2 px-4 rounded transition-colors flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'FILL' 1">add</span>
+        New Analysis
+      </button>
+    </div>
+
+    <!-- Main nav -->
+    <nav class="flex-1 py-3 px-3 flex flex-col gap-1">
+      <a href="#" class="nav-link active" data-view="exploration" id="nav-exploration">
+        <span class="material-symbols-outlined" style="font-size:20px">query_stats</span>
+        <span>Exploration</span>
+      </a>
+      <a href="#" class="nav-link" data-view="analysis" id="nav-analysis">
+        <span class="material-symbols-outlined" style="font-size:20px">analytics</span>
+        <span>Analysis</span>
+      </a>
+      <a href="#" class="nav-link" data-view="archives" id="nav-archives">
+        <span class="material-symbols-outlined" style="font-size:20px">inventory_2</span>
+        <span>Archives</span>
+      </a>
+      <a href="#" class="nav-link" data-view="databases" id="nav-databases">
+        <span class="material-symbols-outlined" style="font-size:20px">storage</span>
+        <span>Databases</span>
+      </a>
+    </nav>
+
+    <!-- Footer nav -->
+    <div class="p-3 border-t border-outline-variant flex flex-col gap-1">
+      <a href="#" class="nav-link" data-view="settings" id="nav-settings">
+        <span class="material-symbols-outlined" style="font-size:18px">settings</span>
+        <span>Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       TOP BAR
+  ═══════════════════════════════════════════════════════ -->
+  <header class="fixed top-0 left-[280px] right-0 z-30 h-16 flex items-center justify-between px-8 border-b border-outline-variant bg-surface-dim/95 backdrop-blur-sm">
+    <div class="flex items-center gap-6 h-full">
+      <div id="topbar-tabs" class="flex items-center gap-1 h-full"></div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div id="server-status" class="flex items-center gap-1.5 font-mono text-[11px] text-on-surface-variant">
+        <span class="w-1.5 h-1.5 rounded-full bg-primary-fixed-dim animate-pulse"></span>
+        <span id="status-text">Connecting…</span>
+      </div>
+      <div class="w-px h-5 bg-outline-variant mx-1"></div>
+      <button id="btn-execute" class="bg-surface-container-high border border-primary-fixed-dim/40 hover:border-primary-fixed-dim text-primary-fixed font-body font-bold text-[11px] uppercase tracking-widest py-1.5 px-4 rounded transition-colors flex items-center gap-2">
+        Execute Query
+        <span class="material-symbols-outlined" style="font-size:15px">arrow_forward</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MAIN CONTENT (views)
+  ═══════════════════════════════════════════════════════ -->
+  <main class="ml-[280px] mt-16 h-[calc(100vh-64px)] overflow-hidden flex">
+
+    <!-- ── EXPLORATION VIEW ───────────────────────────────── -->
+    <section id="view-exploration" class="view active flex w-full overflow-hidden">
+
+      <!-- Left sidebar: DB selector -->
+      <aside class="w-64 border-r border-outline-variant bg-surface-container-low flex flex-col shrink-0">
+        <div class="p-4 border-b border-outline-variant sticky top-0 bg-surface-container-low/90 backdrop-blur z-10">
+          <h2 class="label-caps text-on-surface mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined" style="font-size:15px">database</span>
+            ACTIVE DATABASES
+          </h2>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size:15px">search</span>
+            <input id="db-filter-input" type="text" placeholder="Filter sources…" class="input-field pl-8 w-full"/>
+          </div>
+        </div>
+        <div id="db-list" class="p-2 flex flex-col gap-1 flex-1 overflow-y-auto scrollbar-thin"></div>
+        <div class="p-3 border-t border-outline-variant">
+          <button id="btn-connect-db-sidebar" class="w-full ghost-btn flex items-center justify-center gap-2 py-2">
+            <span class="material-symbols-outlined" style="font-size:15px">add_link</span>
+            Connect Database
+          </button>
+        </div>
+      </aside>
+
+      <!-- Right: search + results -->
+      <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        <!-- Search panel -->
+        <div class="p-5 border-b border-outline-variant bg-surface shrink-0">
+          <!-- Table selector row -->
+          <div class="flex items-center gap-3 mb-3">
+            <select id="table-select" class="input-field font-mono text-[13px] min-w-[200px]">
+              <option value="">— Select Table —</option>
+            </select>
+            <select id="date-field-select" class="input-field font-mono text-[13px] min-w-[160px]">
+              <option value="">No date field</option>
+            </select>
+            <input id="date-from" type="date" class="input-field font-mono text-[12px]"/>
+            <span class="text-on-surface-variant text-[11px]">→</span>
+            <input id="date-to" type="date" class="input-field font-mono text-[12px]"/>
+          </div>
+
+          <!-- Filter chips container -->
+          <div id="filter-chips-container" class="bg-surface-container border border-outline-variant rounded-lg p-1 focus-within:border-primary-fixed-dim/50 focus-within:ring-1 focus-within:ring-primary-fixed-dim/20 transition-all mb-3">
+            <div id="filter-chips" class="flex flex-wrap gap-2 p-2 min-h-[40px]">
+              <!-- chips injected here -->
+            </div>
+            <!-- Add filter row -->
+            <div class="flex flex-wrap items-center gap-2 p-2 border-t border-outline-variant/50">
+              <select id="new-filter-field" class="input-field font-mono text-[12px] min-w-[120px]">
+                <option value="">Field…</option>
+              </select>
+              <select id="new-filter-op" class="input-field font-mono text-[12px]">
+                <option value="contains">CONTAINS</option>
+                <option value="not_contains">NOT CONTAINS</option>
+                <option value="equals">EQUALS</option>
+                <option value="not_equals">NOT EQUALS</option>
+                <option value="starts_with">STARTS WITH</option>
+                <option value="ends_with">ENDS WITH</option>
+                <option value="gt">GT (&gt;)</option>
+                <option value="lt">LT (&lt;)</option>
+                <option value="between">BETWEEN</option>
+                <option value="is_null">IS NULL</option>
+                <option value="is_not_null">IS NOT NULL</option>
+              </select>
+              <input id="new-filter-value" type="text" placeholder="Value…" class="input-field font-mono text-[12px] min-w-[140px] flex-1"/>
+              <input id="new-filter-value2" type="text" placeholder="Value 2 (BETWEEN)…" class="input-field font-mono text-[12px] w-40 hidden"/>
+              <button id="btn-add-filter" class="primary-btn py-1.5 px-3 text-[11px]">+ Add Filter</button>
+            </div>
+          </div>
+
+          <!-- Filter bar -->
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="flex rounded bg-surface-container-lowest border border-outline-variant overflow-hidden">
+                <button id="logic-and" class="logic-btn active px-3 py-1.5">AND</button>
+                <button id="logic-or" class="logic-btn px-3 py-1.5">OR</button>
+              </div>
+              <select id="sort-field-select" class="input-field font-mono text-[12px] min-w-[120px]">
+                <option value="">Sort by…</option>
+              </select>
+              <div class="flex rounded bg-surface-container-lowest border border-outline-variant overflow-hidden">
+                <button id="sort-asc" class="logic-btn active px-3 py-1.5">ASC</button>
+                <button id="sort-desc" class="logic-btn px-3 py-1.5">DESC</button>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="btn-clear-filters" class="text-on-surface-variant hover:text-on-surface font-body text-[11px] uppercase tracking-wider px-2 py-1 transition-colors">Clear All</button>
+              <button id="btn-search" class="primary-btn flex items-center gap-2 py-1.5 px-4">
+                <span class="material-symbols-outlined" style="font-size:15px">search</span>
+                SEARCH
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results table -->
+        <div class="flex-1 bg-surface-container-lowest relative flex flex-col overflow-hidden">
+          <!-- Sticky table header -->
+          <div id="results-header" class="hidden px-6 py-2 border-b border-outline-variant bg-surface-dim/90 backdrop-blur z-20 font-body font-bold text-[10px] uppercase tracking-widest text-on-surface-variant sticky top-0"></div>
+          <!-- Table body -->
+          <div id="results-body" class="flex-1 overflow-y-auto scrollbar-thin pb-12">
+            <div id="results-empty" class="flex flex-col items-center justify-center h-full gap-4 text-on-surface-variant">
+              <span class="material-symbols-outlined text-outline" style="font-size:48px">manage_search</span>
+              <p class="font-body text-[14px]">Connect a database and run a search to see results here.</p>
+            </div>
+          </div>
+          <!-- Status bar -->
+          <div id="results-status" class="absolute bottom-0 left-0 right-0 h-9 border-t border-outline-variant bg-surface-container flex items-center justify-between px-6 font-mono text-[11px] text-on-surface-variant z-20">
+            <span id="status-count">No results</span>
+            <div class="flex items-center gap-4">
+              <span id="status-timing" class="flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-fixed-dim"></span>
+                Ready
+              </span>
+              <button id="btn-prev-page" class="text-on-surface-variant hover:text-on-surface transition-colors disabled:opacity-30" disabled>
+                <span class="material-symbols-outlined" style="font-size:16px">chevron_left</span>
+              </button>
+              <span id="status-page" class="font-mono text-[11px]">Page 1</span>
+              <button id="btn-next-page" class="text-on-surface-variant hover:text-on-surface transition-colors disabled:opacity-30" disabled>
+                <span class="material-symbols-outlined" style="font-size:16px">chevron_right</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ANALYSIS VIEW (Uniques) ────────────────────────── -->
+    <section id="view-analysis" class="view hidden flex-col w-full overflow-hidden">
+      <!-- Page header -->
+      <div class="px-8 py-5 border-b border-outline-variant bg-surface-container-lowest shrink-0">
+        <div class="flex items-end justify-between">
+          <div>
+            <h2 class="font-headline font-semibold text-[24px] leading-8 text-on-surface mb-1">Uniques &amp; Frequencies</h2>
+            <p class="text-[14px] text-on-surface-variant">Isolate repeating patterns and chronological clusters within the dataset.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <select id="uniq-db-select" class="input-field font-mono text-[12px]">
+              <option value="">— Select Database —</option>
+            </select>
+            <select id="uniq-table-select" class="input-field font-mono text-[12px]">
+              <option value="">— Select Table —</option>
+            </select>
+            <select id="uniq-field-select" class="input-field font-mono text-[12px]">
+              <option value="">Group by Field…</option>
+            </select>
+            <select id="uniq-date-field-select" class="input-field font-mono text-[12px]">
+              <option value="">Timeline field…</option>
+            </select>
+            <button id="btn-load-uniques" class="primary-btn py-1.5 px-4 text-[11px]">ANALYSE</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento grid -->
+      <div class="flex-1 p-6 overflow-hidden flex gap-6 min-h-0">
+        <!-- Left: uniques table -->
+        <div class="w-1/3 flex flex-col bg-surface-container border border-outline-variant rounded-lg overflow-hidden relative">
+          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary-fixed-dim/50 to-transparent"></div>
+          <div class="p-4 border-b border-outline-variant bg-surface-container-highest flex justify-between items-center shrink-0">
+            <span class="label-caps text-on-surface">Extracted Values</span>
+            <span id="uniq-total" class="font-mono text-[11px] text-on-surface-variant">Total Unique: —</span>
+          </div>
+          <div class="p-2 border-b border-outline-variant bg-surface-container">
+            <input id="uniq-search" type="text" placeholder="Filter values…" class="input-field w-full font-mono text-[12px]"/>
+          </div>
+          <div class="flex-1 overflow-y-auto scrollbar-thin">
+            <table class="w-full text-left border-collapse">
+              <thead class="sticky top-0 bg-surface-container/95 backdrop-blur z-10 border-b border-outline-variant">
+                <tr>
+                  <th class="py-2 px-4 label-caps text-on-surface-variant w-3/5">Value</th>
+                  <th class="py-2 px-4 label-caps text-on-surface-variant text-right">Count</th>
+                </tr>
+              </thead>
+              <tbody id="uniq-table-body" class="font-mono text-[12px] divide-y divide-outline-variant/30">
+                <tr><td colspan="2" class="px-4 py-6 text-center text-on-surface-variant text-[13px]">No data — run analysis above.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right: detail stage -->
+        <div class="w-2/3 flex flex-col gap-4 min-h-0">
+          <!-- Selected value + bar chart -->
+          <div id="uniq-detail-panel" class="bg-surface-container border border-outline-variant rounded-lg p-5 flex flex-col gap-4 shrink-0 relative overflow-hidden" style="box-shadow:inset 0 0 12px rgba(0,219,231,0.1)">
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="label-caps text-primary-fixed-dim mb-1">Selected Value</div>
+                <div id="uniq-selected-value" class="font-mono text-[18px] text-on-surface">—</div>
+              </div>
+              <button id="btn-link-note-uniq" class="ghost-btn flex items-center gap-2 py-1.5 px-3 text-[11px]">
+                <span class="material-symbols-outlined" style="font-size:15px">edit_note</span>
+                Link to Notes
+              </button>
+            </div>
+            <div id="uniq-bar-chart" class="border-t border-outline-variant pt-4">
+              <div class="font-mono text-[11px] text-on-surface-variant mb-2">Frequency Distribution</div>
+              <div id="uniq-bars" class="flex items-end gap-1 h-16 w-full opacity-80"></div>
+            </div>
+          </div>
+
+          <!-- Bottom: timeline + notes -->
+          <div class="flex gap-4 flex-1 min-h-0">
+            <!-- Timeline -->
+            <div class="flex-1 bg-surface-container border border-outline-variant rounded-lg flex flex-col overflow-hidden">
+              <div class="p-4 border-b border-outline-variant bg-surface-container-highest shrink-0">
+                <h3 class="label-caps text-on-surface flex items-center gap-2">
+                  <span class="material-symbols-outlined" style="font-size:15px">history</span>
+                  Chronological Events
+                </h3>
+              </div>
+              <div id="uniq-timeline" class="flex-1 overflow-y-auto p-5 relative scrollbar-thin">
+                <p class="text-center text-on-surface-variant text-[13px] mt-8">Select a value to view its timeline.</p>
+              </div>
+            </div>
+            <!-- Notes -->
+            <div class="flex-1 bg-surface-container border border-outline-variant rounded-lg flex flex-col overflow-hidden">
+              <div class="p-4 border-b border-outline-variant bg-surface-container-highest shrink-0">
+                <h3 class="label-caps text-on-surface flex items-center gap-2">
+                  <span class="material-symbols-outlined" style="font-size:15px">sticky_note_2</span>
+                  Analytical Notes
+                </h3>
+              </div>
+              <div id="uniq-notes-list" class="flex-1 overflow-y-auto p-3 scrollbar-thin flex flex-col gap-2"></div>
+              <div class="p-4 border-t border-outline-variant bg-surface-container-highest/50 shrink-0">
+                <textarea id="uniq-note-input" rows="3" placeholder="Add observation for selected value…" class="input-field w-full resize-none font-body text-[13px] mb-2"></textarea>
+                <button id="btn-save-uniq-note" class="primary-btn w-full py-1.5 text-[11px]">Save Note</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ARCHIVES VIEW ──────────────────────────────────── -->
+    <section id="view-archives" class="view hidden flex-col w-full overflow-hidden">
+      <div class="px-8 py-5 border-b border-outline-variant bg-surface-container-lowest shrink-0 flex items-center justify-between">
+        <div>
+          <h2 class="font-headline font-semibold text-[24px] leading-8 text-on-surface mb-1">Saved Findings Repository</h2>
+          <p class="text-[14px] text-on-surface-variant">Annotated results with crosslinks and notes.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="btn-create-group" class="ghost-btn flex items-center gap-2 py-1.5 px-3 text-[11px]">
+            <span class="material-symbols-outlined" style="font-size:15px">create_new_folder</span>
+            New Group
+          </button>
+          <button id="btn-refresh-archives" class="ghost-btn flex items-center gap-2 py-1.5 px-3 text-[11px]">
+            <span class="material-symbols-outlined" style="font-size:15px">refresh</span>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 flex overflow-hidden min-h-0">
+        <!-- Left: saved results table -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <div class="overflow-auto scrollbar-thin flex-1">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-10">
+                <tr>
+                  <th class="px-4 py-3 label-caps text-on-surface-variant w-8"></th>
+                  <th class="px-4 py-3 label-caps text-on-surface-variant">ID</th>
+                  <th class="px-4 py-3 label-caps text-on-surface-variant">Database</th>
+                  <th class="px-4 py-3 label-caps text-on-surface-variant">Table</th>
+                  <th class="px-4 py-3 label-caps text-on-surface-variant">Label</th>
+                  <th class="px-4 py-3 label-caps text-on-surface-variant">Saved At</th>
+                  <th class="px-4 py-3 label-caps text-on-surface-variant text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="archives-body" class="font-mono text-[12px] divide-y divide-outline-variant/30">
+                <tr><td colspan="7" class="px-4 py-8 text-center text-on-surface-variant">No saved findings yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right: notes panel -->
+        <aside class="w-80 border-l border-outline-variant flex flex-col shrink-0 bg-surface-container-low">
+          <div class="p-4 border-b border-outline-variant flex items-center justify-between">
+            <h3 class="font-headline font-semibold text-[16px] text-on-surface">Research Notes</h3>
+            <span id="archives-note-target" class="font-mono text-[10px] text-primary-fixed-dim"></span>
+          </div>
+          <div id="archives-notes-list" class="flex-1 overflow-y-auto p-3 scrollbar-thin flex flex-col gap-2"></div>
+          <div class="p-4 border-t border-outline-variant shrink-0">
+            <textarea id="archives-note-input" rows="4" placeholder="Add note to selected result…" class="input-field w-full resize-none font-body text-[13px] mb-2"></textarea>
+            <button id="btn-save-archives-note" class="primary-btn w-full py-1.5 text-[11px]">Save Note</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ── DATABASES VIEW ─────────────────────────────────── -->
+    <section id="view-databases" class="view hidden flex-col w-full overflow-auto scrollbar-thin">
+      <div class="px-8 py-5 border-b border-outline-variant bg-surface-container-lowest sticky top-0 z-10 flex items-center justify-between">
+        <h2 class="font-headline font-semibold text-[24px] leading-8 text-on-surface">Connected Databases</h2>
+        <button id="btn-connect-db-main" class="ghost-btn flex items-center gap-2 py-1.5 px-4 text-[11px]">
+          <span class="material-symbols-outlined" style="font-size:15px">add_link</span>
+          Connect SQLite
+        </button>
+      </div>
+      <div id="db-cards" class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- ── SETTINGS VIEW ──────────────────────────────────── -->
+    <section id="view-settings" class="view hidden flex-col w-full overflow-auto scrollbar-thin p-8">
+      <h2 class="font-headline font-semibold text-[24px] leading-8 text-on-surface mb-6">Settings</h2>
+      <div class="max-w-lg bg-surface-container border border-outline-variant rounded-lg p-6">
+        <div class="label-caps text-on-surface-variant mb-4">SERVER INFO</div>
+        <div id="settings-info" class="font-mono text-[12px] text-on-surface space-y-2"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MODALS
+  ═══════════════════════════════════════════════════════ -->
+
+  <!-- Connect DB modal -->
+  <dialog id="modal-connect-db" class="modal">
+    <div class="modal-content w-[480px]">
+      <div class="modal-header">
+        <h3 class="font-headline font-semibold text-[18px] text-on-surface">Connect Database</h3>
+        <button class="modal-close" data-modal="modal-connect-db"><span class="material-symbols-outlined" style="font-size:20px">close</span></button>
+      </div>
+      <div class="p-6 flex flex-col gap-4">
+        <div>
+          <label class="label-caps text-on-surface-variant block mb-2">Alias (optional)</label>
+          <input id="conn-alias" type="text" placeholder="My Database" class="input-field w-full"/>
+        </div>
+        <div>
+          <label class="label-caps text-on-surface-variant block mb-2">SQLite File Path *</label>
+          <input id="conn-path" type="text" placeholder="/path/to/database.sqlite" class="input-field w-full font-mono text-[12px]"/>
+        </div>
+        <div id="conn-error" class="hidden text-error font-body text-[13px] p-3 bg-error-container/20 rounded border border-error/30"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="ghost-btn py-1.5 px-4 text-[11px] modal-close" data-modal="modal-connect-db">Cancel</button>
+        <button id="btn-conn-submit" class="primary-btn py-1.5 px-4 text-[11px]">Connect</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Antecedents modal -->
+  <dialog id="modal-antecedents" class="modal">
+    <div class="modal-content w-[700px]">
+      <div class="modal-header">
+        <div>
+          <h3 class="font-headline font-semibold text-[18px] text-on-surface">Chronological Antecedents</h3>
+          <p id="antecedent-subtitle" class="font-mono text-[11px] text-on-surface-variant mt-1"></p>
+        </div>
+        <button class="modal-close" data-modal="modal-antecedents"><span class="material-symbols-outlined" style="font-size:20px">close</span></button>
+      </div>
+      <div id="antecedent-body" class="p-4 max-h-[60vh] overflow-y-auto scrollbar-thin">
+        <div class="flex flex-col gap-3 relative">
+          <div class="absolute left-[19px] top-0 bottom-0 w-px bg-outline-variant/50"></div>
+          <div id="antecedent-list" class="flex flex-col gap-4 relative z-10"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="ghost-btn py-1.5 px-4 text-[11px] modal-close" data-modal="modal-antecedents">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Note crosslink modal -->
+  <dialog id="modal-note" class="modal">
+    <div class="modal-content w-[520px]">
+      <div class="modal-header">
+        <h3 class="font-headline font-semibold text-[18px] text-on-surface">Add / Edit Note</h3>
+        <button class="modal-close" data-modal="modal-note"><span class="material-symbols-outlined" style="font-size:20px">close</span></button>
+      </div>
+      <div class="p-6 flex flex-col gap-4">
+        <div>
+          <label class="label-caps text-on-surface-variant block mb-2">Title</label>
+          <input id="note-title" type="text" placeholder="Note title…" class="input-field w-full"/>
+        </div>
+        <div>
+          <label class="label-caps text-on-surface-variant block mb-2">Content</label>
+          <textarea id="note-content" rows="6" class="input-field w-full resize-none font-body text-[13px]" placeholder="Enter your observations…"></textarea>
+        </div>
+        <input type="hidden" id="note-target-type"/>
+        <input type="hidden" id="note-target-id"/>
+        <input type="hidden" id="note-id"/>
+      </div>
+      <div class="modal-footer">
+        <button class="ghost-btn py-1.5 px-4 text-[11px] modal-close" data-modal="modal-note">Cancel</button>
+        <button id="btn-note-submit" class="primary-btn py-1.5 px-4 text-[11px]">Save Note</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+    <div id="toast-inner" class="bg-surface-container-highest border border-outline-variant rounded px-4 py-3 font-body text-[13px] text-on-surface flex items-center gap-3 shadow-lg">
+      <span id="toast-icon" class="material-symbols-outlined text-primary-fixed-dim" style="font-size:18px">check_circle</span>
+      <span id="toast-msg"></span>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
