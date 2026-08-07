@@ -14,4 +14,4 @@ builds/.pyinstaller/
 .coverage
 .pytest_cache/
 htmlcov/
-builds/
+
