@@ -8,7 +8,7 @@ import { DatabaseSource, QueryResult } from '../types';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <main class="flex-1 md:ml-[280px] md:mt-16 bg-surface flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
+    <main class="flex-1 md:mt-16 bg-surface flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
 
       <!-- Left Sidebar: Database Filters -->
       <aside class="w-full md:w-64 border-r border-outline-variant bg-surface-container-low flex flex-col overflow-y-auto shrink-0 hidden lg:flex">

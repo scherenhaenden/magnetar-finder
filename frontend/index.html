@@ -114,6 +114,14 @@
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">add</span>
         New Analysis
       </button>
+      <button id="btn-add-database" class="w-full ghost-btn flex items-center justify-center gap-2 py-2 mt-2">
+        <span class="material-symbols-outlined" style="font-size:16px">add_link</span>
+        Add Database
+      </button>
+      <div class="analysis-tabs-section mt-5">
+        <div class="label-caps text-on-surface-variant px-2 mb-2">ANALYSES</div>
+        <div id="analysis-tabs" class="flex flex-col gap-1"></div>
+      </div>
     </div>
 
     <!-- Main nav -->
@@ -218,10 +226,20 @@
       <!-- Right: search + results -->
       <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
 
+        <!-- Independent query workspaces -->
+        <div class="query-tabs shrink-0 flex items-center gap-1 px-5 pt-3 border-b border-outline-variant bg-surface-container-lowest overflow-x-auto">
+          <div id="query-tabs" class="flex items-end gap-1 min-w-0"></div>
+          <button id="btn-new-query" class="query-tab-new shrink-0" title="Create a new query">
+            <span class="material-symbols-outlined" style="font-size:15px">add</span> NEW QUERY
+          </button>
+        </div>
+
+        <div id="exploration-panels" class="exploration-panels">
+
         <!-- Search panel -->
-        <div class="p-5 border-b border-outline-variant bg-surface shrink-0">
+        <div id="search-panel" class="exploration-search-panel p-5 border-b border-outline-variant bg-surface">
           <!-- Table selector row -->
-          <div class="flex items-center gap-3 mb-3">
+          <div class="table-selector-row flex flex-wrap items-center gap-3 mb-3 min-w-0">
             <select id="table-select" class="input-field font-mono text-[13px] min-w-[200px]">
               <option value="">— Select Table —</option>
             </select>
@@ -235,8 +253,45 @@
 
           <!-- Filter chips container -->
           <div id="filter-chips-container" class="bg-surface-container border border-outline-variant rounded-lg p-1 focus-within:border-primary-fixed-dim/50 focus-within:ring-1 focus-within:ring-primary-fixed-dim/20 transition-all mb-3">
-            <div id="filter-chips" class="flex flex-wrap gap-2 p-2 min-h-[40px]">
+            <div id="filter-chips" class="flex flex-wrap gap-2 p-2 min-h-[40px]" aria-label="Filter expression">
               <!-- chips injected here -->
+            </div>
+            <div class="flex flex-wrap items-center gap-2 px-2 pb-2 border-t border-outline-variant/50 pt-2">
+              <span class="label-caps text-on-surface-variant">ADD TO GROUP</span>
+              <select id="filter-target-group" class="input-field font-mono text-[12px] min-w-[190px]"></select>
+              <button id="btn-add-filter-group" class="ghost-btn py-1.5 px-3 text-[11px]">+ GROUP</button>
+              <button id="btn-wrap-filters" class="ghost-btn py-1.5 px-3 text-[11px]">GROUP CURRENT</button>
+              <select id="global-case-mode" class="input-field font-mono text-[12px]" title="Case mode for all filters">
+                <option value="">CASE MODE…</option>
+                <option value="insensitive">CASE INSENSITIVE</option>
+                <option value="sensitive">CASE SENSITIVE</option>
+              </select>
+              <button id="btn-apply-case-all" class="ghost-btn py-1.5 px-3 text-[11px]">APPLY CASE TO ALL</button>
+              <span class="text-on-surface-variant text-[11px]">Groups render as parentheses; choose AND/OR inside each group.</span>
+            </div>
+            <div id="filter-expression-preview" class="filter-expression-preview hidden"></div>
+            <div id="filter-bulk-editor" class="filter-bulk-editor hidden">
+              <span id="filter-selected-count" class="label-caps text-primary-fixed-dim">0 SELECTED</span>
+              <select id="bulk-filter-case" class="input-field font-mono text-[12px]" title="Case mode to apply">
+                <option value="">KEEP CASE MODE</option>
+                <option value="insensitive">CASE INSENSITIVE</option>
+                <option value="sensitive">CASE SENSITIVE</option>
+              </select>
+              <select id="bulk-filter-op" class="input-field font-mono text-[12px]" title="Operator to apply">
+                <option value="">KEEP OPERATOR</option>
+                <option value="contains">CONTAINS</option>
+                <option value="not_contains">NOT CONTAINS</option>
+                <option value="contains_in">CONTAINS IN (list)</option>
+                <option value="not_contains_in">NOT CONTAINS IN (list)</option>
+                <option value="equals">EQUALS</option>
+                <option value="starts_with">STARTS WITH</option>
+                <option value="ends_with">ENDS WITH</option>
+              </select>
+              <input id="bulk-filter-value" type="text" placeholder="Apply value to selected…" class="input-field font-mono text-[12px] flex-1 min-w-[180px]"/>
+              <button id="btn-apply-bulk-filter" class="primary-btn py-1.5 px-3 text-[11px]">APPLY TO SELECTED</button>
+              <select id="bulk-move-target" class="input-field font-mono text-[12px] min-w-[150px]" title="Move selected filters to a group"></select>
+              <button id="btn-move-selected-filters" class="ghost-btn py-1.5 px-3 text-[11px]">MOVE SELECTED</button>
+              <button id="btn-clear-filter-selection" class="ghost-btn py-1.5 px-3 text-[11px]">CLEAR SELECTION</button>
             </div>
             <!-- Add filter row -->
             <div class="flex flex-wrap items-center gap-2 p-2 border-t border-outline-variant/50">
@@ -246,6 +301,8 @@
               <select id="new-filter-op" class="input-field font-mono text-[12px]">
                 <option value="contains">CONTAINS</option>
                 <option value="not_contains">NOT CONTAINS</option>
+                <option value="contains_in">CONTAINS IN (list)</option>
+                <option value="not_contains_in">NOT CONTAINS IN (list)</option>
                 <option value="equals">EQUALS</option>
                 <option value="not_equals">NOT EQUALS</option>
                 <option value="starts_with">STARTS WITH</option>
@@ -256,9 +313,14 @@
                 <option value="is_null">IS NULL</option>
                 <option value="is_not_null">IS NOT NULL</option>
               </select>
+              <select id="new-filter-case" class="input-field font-mono text-[12px]" title="Case sensitivity">
+                <option value="insensitive">CASE INSENSITIVE</option>
+                <option value="sensitive">CASE SENSITIVE</option>
+              </select>
               <input id="new-filter-value" type="text" placeholder="Value…" class="input-field font-mono text-[12px] min-w-[140px] flex-1"/>
               <input id="new-filter-value2" type="text" placeholder="Value 2 (BETWEEN)…" class="input-field font-mono text-[12px] w-40 hidden"/>
               <button id="btn-add-filter" class="primary-btn py-1.5 px-3 text-[11px]">+ Add Filter</button>
+              <button id="btn-cancel-filter-edit" class="ghost-btn py-1.5 px-3 text-[11px] hidden">CANCEL EDIT</button>
             </div>
           </div>
 
@@ -285,19 +347,82 @@
               </button>
             </div>
           </div>
+
+          <!-- Chained result lists -->
+          <div id="sublist-panel" class="hidden mt-3 p-3 rounded-lg border border-primary-fixed-dim/30 bg-surface-container-lowest">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="label-caps text-primary-fixed-dim">RESULT CHAIN</span>
+              <select id="sublist-select" class="input-field font-mono text-[12px] min-w-[150px]"></select>
+              <span id="sublist-count" class="font-mono text-[11px] text-on-surface-variant"></span>
+              <span class="text-on-surface-variant text-[11px]">then filter this list:</span>
+              <select id="sublist-field" class="input-field font-mono text-[12px] min-w-[120px]"></select>
+              <select id="sublist-op" class="input-field font-mono text-[12px]">
+                <option value="contains">CONTAINS</option>
+                <option value="not_contains">NOT CONTAINS</option>
+                <option value="equals">EQUALS</option>
+                <option value="not_equals">NOT EQUALS</option>
+                <option value="starts_with">STARTS WITH</option>
+                <option value="ends_with">ENDS WITH</option>
+                <option value="is_null">IS NULL</option>
+                <option value="is_not_null">IS NOT NULL</option>
+              </select>
+              <input id="sublist-value" type="text" placeholder="Value…" class="input-field font-mono text-[12px] min-w-[130px] flex-1"/>
+              <button id="btn-sublist-filter" class="primary-btn py-1.5 px-3 text-[11px]">+ SUBLIST</button>
+              <button id="btn-sublist-reset" class="ghost-btn py-1.5 px-3 text-[11px]">RESET</button>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-outline-variant/50">
+              <span class="label-caps text-on-surface-variant">GROUP ACTIVE LIST BY</span>
+              <select id="sublist-group-field" class="input-field font-mono text-[12px] min-w-[150px]"></select>
+              <button id="btn-sublist-group" class="ghost-btn py-1.5 px-3 text-[11px]">COUNT VALUES</button>
+              <span id="sublist-group-summary" class="font-mono text-[11px] text-on-surface-variant"></span>
+            </div>
+            <div id="sublist-groups" class="hidden mt-3 grid grid-cols-2 md:grid-cols-4 gap-2"></div>
+          </div>
+        </div>
+
+        <div id="results-panel-splitter" class="results-panel-splitter" role="separator" aria-orientation="horizontal" aria-label="Resize search and results panels" tabindex="0">
+          <span class="results-panel-splitter-grip" aria-hidden="true"></span>
+        </div>
+
+        <!-- Current query subviews -->
+        <div id="results-panel" class="exploration-results-panel">
+        <div class="query-subtabs shrink-0 flex items-center gap-1 px-5 border-b border-outline-variant bg-surface-container-lowest" role="tablist" aria-label="Current query views">
+          <span id="query-context-label" class="query-context-label">QUERY: —</span>
+          <button id="subtab-results" class="query-subtab active" type="button" data-result-subview="results" role="tab" aria-selected="true">
+            <span class="material-symbols-outlined" style="font-size:15px">table_view</span> RESULTS
+          </button>
+          <button id="subtab-analysis" class="query-subtab" type="button" data-result-subview="analysis" role="tab" aria-selected="false">
+            <span class="material-symbols-outlined" style="font-size:15px">monitoring</span> MATCH ANALYSIS
+          </button>
         </div>
 
         <!-- Results table -->
-        <div class="flex-1 bg-surface-container-lowest relative flex flex-col overflow-hidden">
-          <!-- Sticky table header -->
-          <div id="results-header" class="hidden px-6 py-2 border-b border-outline-variant bg-surface-dim/90 backdrop-blur z-20 font-body font-bold text-[10px] uppercase tracking-widest text-on-surface-variant sticky top-0"></div>
-          <!-- Table body -->
-          <div id="results-body" class="flex-1 overflow-y-auto scrollbar-thin pb-12">
-            <div id="results-empty" class="flex flex-col items-center justify-center h-full gap-4 text-on-surface-variant">
-              <span class="material-symbols-outlined text-outline" style="font-size:48px">manage_search</span>
-              <p class="font-body text-[14px]">Connect a database and run a search to see results here.</p>
+        <div id="results-view" class="flex-1 bg-surface-container-lowest relative flex flex-col overflow-hidden">
+          <div id="column-toolbar" class="hidden px-5 py-2 border-b border-outline-variant bg-surface-container text-[11px]">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="label-caps text-primary-fixed-dim">COLUMNS</span>
+              <span class="text-on-surface-variant">Select visibility. Drag headers to reorder; drag the right edge to resize.</span>
+            </div>
+            <div id="column-controls" class="flex flex-wrap gap-2 mt-2"></div>
+          </div>
+          <div id="results-scroll" class="flex-1 min-w-0 overflow-auto scrollbar-thin">
+            <!-- Sticky table header -->
+            <div id="results-header" class="hidden px-6 py-2 border-b border-outline-variant bg-surface-dim/90 backdrop-blur z-20 font-body font-bold text-[10px] uppercase tracking-widest text-on-surface-variant sticky top-0"></div>
+            <!-- Table body -->
+            <div id="results-body" class="pb-12">
+              <div id="results-empty" class="flex flex-col items-center justify-center h-full gap-4 text-on-surface-variant">
+                <span class="material-symbols-outlined text-outline" style="font-size:48px">manage_search</span>
+                <p class="font-body text-[14px]">Connect a database and run a search to see results here.</p>
+              </div>
             </div>
           </div>
+          <details id="query-debug" class="query-debug">
+            <summary><span class="material-symbols-outlined" style="font-size:15px">bug_report</span> QUERY DEBUG</summary>
+            <div class="query-debug-body">
+              <div id="query-debug-meta" class="query-debug-meta">Run a search to inspect the generated query.</div>
+              <pre id="query-debug-sql" class="query-debug-code">No query executed.</pre>
+            </div>
+          </details>
           <!-- Status bar -->
           <div id="results-status" class="absolute bottom-0 left-0 right-0 h-9 border-t border-outline-variant bg-surface-container flex items-center justify-between px-6 font-mono text-[11px] text-on-surface-variant z-20">
             <span id="status-count">No results</span>
@@ -315,6 +440,47 @@
               </button>
             </div>
           </div>
+        </div>
+
+        <!-- Current query match analysis -->
+        <section id="match-analysis-view" class="hidden flex-1 min-h-0 overflow-y-auto scrollbar-thin bg-surface-container-lowest p-5" role="tabpanel" aria-labelledby="subtab-analysis">
+          <div class="match-analysis-shell">
+            <div class="match-analysis-heading">
+              <div>
+                <div class="label-caps text-primary-fixed-dim">MATCH ANALYSIS</div>
+                <h2 class="font-headline text-[20px] font-semibold text-on-surface mt-1">Patterns in the current query</h2>
+                <p class="text-[12px] text-on-surface-variant mt-1">Charts use all rows matched by this query, not only the current grid page. Query results are never stored in localStorage.</p>
+              </div>
+              <div class="match-analysis-control">
+                <label for="analysis-field-select" class="label-caps text-on-surface-variant">COUNT VALUES BY</label>
+                <select id="analysis-field-select" class="input-field font-mono text-[12px] min-w-[190px]">
+                  <option value="">Select a field…</option>
+                </select>
+              </div>
+            </div>
+            <div id="match-analysis-loading" class="analysis-loading hidden" role="status" aria-live="polite">
+              <span class="loading-spinner" aria-hidden="true"></span>
+              <span>Loading all matching rows for analysis…</span>
+            </div>
+            <div id="analysis-summary" class="analysis-summary-grid"></div>
+            <div class="analysis-chart-grid">
+              <div class="analysis-card">
+                <div class="analysis-card-heading">
+                  <span class="label-caps text-on-surface">VALUE FREQUENCY</span>
+                  <span id="analysis-frequency-meta" class="font-mono text-[11px] text-on-surface-variant"></span>
+                </div>
+                <div id="analysis-frequency-chart" class="analysis-bars"></div>
+              </div>
+              <div class="analysis-card">
+                <div class="analysis-card-heading">
+                  <span class="label-caps text-on-surface">SOURCE DISTRIBUTION</span>
+                  <span id="analysis-source-meta" class="font-mono text-[11px] text-on-surface-variant"></span>
+                </div>
+                <div id="analysis-source-chart" class="analysis-bars"></div>
+              </div>
+            </div>
+          </div>
+        </section>
         </div>
       </div>
     </section>
@@ -523,18 +689,20 @@
       </div>
       <div class="p-6 flex flex-col gap-4">
         <div>
-          <label class="label-caps text-on-surface-variant block mb-2">Alias (optional)</label>
-          <input id="conn-alias" type="text" placeholder="My Database" class="input-field w-full"/>
+          <label class="label-caps text-on-surface-variant block mb-2">SQLite files *</label>
+          <input id="conn-files" type="file" accept=".sqlite,.sqlite3,.db,.db3" multiple class="input-field w-full"/>
+          <p class="text-[11px] text-on-surface-variant mt-2">Select one or several files. They are copied into the app's local storage.</p>
+          <div id="conn-file-list" class="font-mono text-[11px] text-primary-fixed-dim mt-2 space-y-1"></div>
         </div>
         <div>
-          <label class="label-caps text-on-surface-variant block mb-2">SQLite File Path *</label>
-          <input id="conn-path" type="text" placeholder="/path/to/database.sqlite" class="input-field w-full font-mono text-[12px]"/>
+          <label class="label-caps text-on-surface-variant block mb-2">Alias (optional; one file only)</label>
+          <input id="conn-alias" type="text" placeholder="My Database" class="input-field w-full"/>
         </div>
         <div id="conn-error" class="hidden text-error font-body text-[13px] p-3 bg-error-container/20 rounded border border-error/30"></div>
       </div>
       <div class="modal-footer">
         <button class="ghost-btn py-1.5 px-4 text-[11px] modal-close" data-modal="modal-connect-db">Cancel</button>
-        <button id="btn-conn-submit" class="primary-btn py-1.5 px-4 text-[11px]">Connect</button>
+        <button id="btn-conn-submit" class="primary-btn py-1.5 px-4 text-[11px]">Connect selected</button>
       </div>
     </div>
   </dialog>
@@ -587,6 +755,9 @@
       </div>
     </div>
   </dialog>
+
+  <div id="row-sources-menu" class="row-sources-menu hidden" role="dialog" aria-label="Source databases"></div>
+  <div id="cell-transform-menu" class="cell-transform-menu hidden" role="dialog" aria-label="Auto Transformation"></div>
 
   <!-- Toast notification -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 hidden">

@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Angular standalone templates live in .ts files, so make them explicit
+   Tailwind sources for production builds. */
+@source "./app";
+
 @theme {
   --color-surface: #0d1515;
   --color-surface-dim: #0d1515;

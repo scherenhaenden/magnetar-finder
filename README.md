@@ -10,7 +10,7 @@ Magnetar Finder is a local web application that lets you explore one or more SQL
 
 ---
 
-## What it can do (v0.1.0)
+## What it can do (v0.2.0)
 
 ### 🔍 Exploration — Advanced Search
 - Connect multiple SQLite databases simultaneously
@@ -99,8 +99,11 @@ the build machine's Python runtime is bundled into the executable.
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python3 run.py
+./run.py
 ```
+
+`run.py` is a Python entry point, so run it with `./run.py` (or
+`python3 run.py`), not with `bash ./run.py`.
 
 ---
 

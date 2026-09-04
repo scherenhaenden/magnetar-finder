@@ -10,6 +10,6 @@ def info():
     """Return basic server info."""
     return jsonify({
         "app": "Magnetar Finder",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "status": "online",
     })

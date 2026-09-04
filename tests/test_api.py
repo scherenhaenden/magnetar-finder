@@ -1,5 +1,7 @@
 import os
 import json
+import io
+import sqlite3
 import pytest
 from app.core.results_db import get_connection
 
@@ -36,6 +38,10 @@ def test_databases_crud(client, temp_external_db):
     assert response.status_code == 200
     assert response.get_json()["ok"] is True
 
+    duplicate = client.post("/api/databases/", json=payload)
+    assert duplicate.status_code == 409
+    assert "already added" in duplicate.get_json()["error"]
+
     # Check update was applied
     response = client.get("/api/databases/")
     db_item = next(d for d in response.get_json() if d["id"] == db_id)
@@ -68,6 +74,44 @@ def test_databases_crud(client, temp_external_db):
     response = client.delete(f"/api/databases/{db_id}")
     assert response.status_code == 200
     assert response.get_json()["ok"] is True
+
+
+def test_upload_multiple_databases(client, temp_external_db, monkeypatch, tmp_path):
+    from app.api import databases
+
+    monkeypatch.setattr(databases, "IMPORTED_DB_DIR", tmp_path / "imported")
+    with open(temp_external_db, "rb") as first:
+        first_bytes = first.read()
+    second_source = tmp_path / "second-source.sqlite"
+    with sqlite3.connect(second_source) as second_conn:
+        second_conn.execute("CREATE TABLE other (id INTEGER PRIMARY KEY, value TEXT)")
+        second_conn.execute("INSERT INTO other (value) VALUES ('second')")
+
+    response = client.post(
+        "/api/databases/upload",
+        data={
+            "files": [
+                (io.BytesIO(first_bytes), "first.sqlite"),
+                (io.BytesIO(second_source.read_bytes()), "second.sqlite"),
+            ]
+        },
+        content_type="multipart/form-data",
+    )
+
+    assert response.status_code == 201
+    imported = response.get_json()["imported"]
+    assert len(imported) == 2
+    assert {item["alias"] for item in imported} == {"first.sqlite", "second.sqlite"}
+    assert all(os.path.isfile(item["path"]) for item in imported)
+
+    with open(temp_external_db, "rb") as duplicate_file:
+        duplicate_response = client.post(
+            "/api/databases/upload",
+            data={"files": (duplicate_file, "copy.sqlite")},
+            content_type="multipart/form-data",
+        )
+    assert duplicate_response.status_code == 400
+    assert "already added" in duplicate_response.get_json()["errors"][0]["error"]
 
 
 def test_search_and_filter(client, temp_external_db):
@@ -118,6 +162,68 @@ def test_search_and_filter(client, temp_external_db):
     assert len(results["rows"]) == 2  # 15.4 and 5.9
 
     # Clean up
+    client.delete(f"/api/databases/{db_id}")
+
+
+def test_match_analysis_returns_full_deduplicated_query_separately_from_grid_page(client, temp_external_db):
+    """The visible grid stays paginated; MATCH ANALYSIS must not be."""
+    db_id = client.post("/api/databases/", json={"path": temp_external_db}).get_json()["id"]
+    payload = {"db_ids": [db_id], "table": "detections", "filters": [], "limit": 1, "offset": 0}
+
+    grid_response = client.post("/api/search/", json=payload)
+    assert grid_response.status_code == 200
+    grid = grid_response.get_json()
+    assert grid["total"] == 3
+    assert grid["returned"] == 1
+    assert len(grid["rows"]) == 1
+    assert "analysis_rows" not in grid
+
+    history_before_analysis = client.get("/api/search/history").get_json()
+    analysis_response = client.post("/api/search/analysis", json=payload)
+    assert analysis_response.status_code == 200
+    analysis = analysis_response.get_json()
+    assert analysis["total"] == 3
+    assert len(analysis["rows"]) == 1
+    assert len(analysis["analysis_rows"]) == 3
+    assert analysis["returned"] == 1
+    assert client.get("/api/search/history").get_json() == history_before_analysis
+
+    client.delete(f"/api/databases/{db_id}")
+
+
+def test_search_expression_applies_nested_boolean_logic_to_all_returned_rows(client, temp_external_db):
+    """Regression coverage for grouped filter expressions sent by the query UI."""
+    db_id = client.post("/api/databases/", json={"path": temp_external_db}).get_json()["id"]
+    expression = {
+        "type": "group",
+        "logic": "AND",
+        "children": [
+            {
+                "type": "group",
+                "logic": "OR",
+                "children": [
+                    {"type": "filter", "field": "content", "op": "contains", "value": "intense"},
+                    {"type": "filter", "field": "content", "op": "contains", "value": "harmonic", "join": "OR"},
+                ],
+            },
+            {"type": "filter", "field": "content", "op": "not_contains", "value": "fluctuation", "join": "AND"},
+        ],
+    }
+
+    response = client.post(
+        "/api/search/",
+        json={"db_ids": [db_id], "table": "detections", "filters": [], "expression": expression},
+    )
+
+    assert response.status_code == 200
+    result = response.get_json()
+    assert result["total"] == 2
+    assert {row["content"] for row in result["rows"]} == {
+        "Detection of intense gamma ray burst correlating with magnetic anomaly...",
+        "Pre-burst harmonic resonance observed. Data aligns with model A-4.",
+    }
+    assert all("fluctuation" not in row["content"].lower() for row in result["rows"])
+
     client.delete(f"/api/databases/{db_id}")
 
 
