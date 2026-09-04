@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Magnetar Finder — Main entry point.
 Starts the Flask dev server and opens the browser automatically.

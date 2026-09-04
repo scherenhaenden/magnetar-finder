@@ -8,7 +8,7 @@ import { UniqueGroup } from '../types';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <main class="ml-[280px] pt-16 h-screen overflow-hidden flex flex-col bg-surface text-on-surface">
+    <main class="pt-16 h-screen overflow-hidden flex flex-col bg-surface text-on-surface">
       <!-- Page Header & Global Controls -->
       <div class="px-8 py-6 border-b border-outline-variant bg-surface-container-lowest shrink-0">
         <div class="flex items-end justify-between">

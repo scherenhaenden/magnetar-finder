@@ -8,7 +8,7 @@ import { DatabaseSource, SavedFinding } from '../types';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <main class="ml-[280px] mt-16 p-8 h-[calc(100vh-64px)] overflow-y-auto bg-surface flex gap-6 text-on-surface">
+    <main class="mt-16 p-8 h-[calc(100vh-64px)] overflow-y-auto bg-surface flex gap-6 text-on-surface">
       <!-- Left/Main Column: Databases & Saved Findings -->
       <div class="flex-1 flex flex-col gap-6">
         <!-- Database Management Section -->

@@ -2,7 +2,9 @@
 __pycache__/
 *.pyc
 *.pyo
-data/magnetar_finder.db
+# Local application state and imported SQLite databases.
+data/
+.idea/
 *.egg-info/
 .DS_Store
 design_preview/
@@ -14,4 +16,3 @@ builds/.pyinstaller/
 .coverage
 .pytest_cache/
 htmlcov/
-

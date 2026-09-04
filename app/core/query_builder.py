@@ -34,6 +34,23 @@ OPERATORS = {
 }
 
 
+def _parse_list_value(value: Any) -> list[str]:
+    """Parse ('a','b'), (\"a\",\"b\") or comma-separated input."""
+    text = str(value or "").strip()
+    if text.startswith("(") and text.endswith(")"):
+        text = text[1:-1].strip()
+    if not text:
+        return []
+    values = []
+    for item in text.split(","):
+        item = item.strip()
+        if len(item) >= 2 and item[0] == item[-1] and item[0] in "'\"":
+            item = item[1:-1]
+        if item:
+            values.append(item)
+    return values
+
+
 def build_query(
     table: str,
     filters: list[dict],
@@ -45,6 +62,7 @@ def build_query(
     date_field: str | None = None,
     date_from: str | None = None,
     date_to: str | None = None,
+    expression: dict | None = None,
 ) -> tuple[str, list[Any]]:
     """
     Returns (sql, params) for the query described by the given filters.
@@ -64,28 +82,102 @@ def build_query(
             clauses.append(f'"{date_field}" <= ?')
             params.append(date_to)
 
-    # Field filters
-    for f in filters:
+    def filter_clause(f: dict) -> tuple[str, list[Any]]:
         field = f.get("field", "")
         op = f.get("op", "contains")
         value = f.get("value", "")
         value2 = f.get("value2", "")
+        case_sensitive = f.get("case_sensitive", False) is True
 
-        if not field or op not in OPERATORS and op != "between":
-            continue
+        if not isinstance(field, str) or not field:
+            raise ValueError("Each filter needs a field")
+        if op not in OPERATORS and op not in ("between", "contains_in", "not_contains_in"):
+            raise ValueError(f"Unsupported filter operator: {op}")
 
         if op == "between":
-            clauses.append(f'"{field}" BETWEEN ? AND ?')
-            params += [value, value2]
-            continue
+            return f'"{field}" BETWEEN ? AND ?', [value, value2]
+
+        if op in ("contains_in", "not_contains_in"):
+            values = _parse_list_value(value)
+            if not values:
+                return ("1 = 1" if op == "not_contains_in" else "1 = 0"), []
+            if case_sensitive:
+                matches = " OR ".join(f'instr(CAST("{field}" AS TEXT), ?) > 0' for _ in values)
+            else:
+                matches = " OR ".join(f'instr(lower(CAST("{field}" AS TEXT)), lower(?)) > 0' for _ in values)
+            clause = f"({matches})"
+            if op == "not_contains_in":
+                clause = f"NOT {clause}"
+            return clause, values
+
+        if op in ("contains", "not_contains"):
+            expression = 'instr(CAST("{field}" AS TEXT), ?) > 0' if case_sensitive else 'instr(lower(CAST("{field}" AS TEXT)), lower(?)) > 0'
+            clause = expression.format(field=field)
+            if op == "not_contains":
+                clause = f"NOT ({clause})"
+            return clause, [value]
+
+        if op in ("equals", "not_equals") and not case_sensitive:
+            clause = f'lower(CAST("{field}" AS TEXT)) {"=" if op == "equals" else "!="} lower(?)'
+            return clause, [value]
+
+        if op in ("starts_with", "ends_with"):
+            if op == "starts_with":
+                expression = f'substr(CAST("{field}" AS TEXT), 1, length(?))'
+            else:
+                expression = f'substr(CAST("{field}" AS TEXT), -length(?))'
+            if case_sensitive:
+                return f'{expression} = ?', [value, value]
+            return f'lower({expression}) = lower(?)', [value, value]
 
         builder = OPERATORS.get(op)
         if not builder:
-            continue
+            raise ValueError(f"Unsupported filter operator: {op}")
         clause_tpl, param_fn = builder(field, None)
-        clauses.append(clause_tpl)
-        if param_fn is not None:
-            params.append(param_fn(value))
+        return clause_tpl, [param_fn(value)] if param_fn is not None else []
+
+    def expression_sql(node: dict) -> tuple[str | None, list[Any]]:
+        if node.get("type") == "filter":
+            return filter_clause(node)
+        if node.get("type") != "group":
+            raise ValueError("Each expression node must be a filter or group")
+        node_children = node.get("children", [])
+        if not isinstance(node_children, list):
+            raise ValueError("A filter group must contain a list of conditions")
+        children = []
+        child_params: list[Any] = []
+        for index, child in enumerate(node_children):
+            if not isinstance(child, dict):
+                raise ValueError("A filter group contains an invalid condition")
+            child_sql, params_for_child = expression_sql(child)
+            if child_sql:
+                if children:
+                    join = child.get("join", node.get("logic", "AND")).upper()
+                    if join not in ("AND", "OR"):
+                        join = "AND"
+                    children.append(f"{join} {child_sql}")
+                else:
+                    children.append(child_sql)
+                child_params.extend(params_for_child)
+        if not children:
+            return None, []
+        return f"({' '.join(children)})", child_params
+
+    # A supplied grouped expression is authoritative. Never fall back to flat
+    # filters (or an unfiltered query) when it cannot be compiled.
+    if expression:
+        if not isinstance(expression, dict):
+            raise ValueError("The filter expression must be an object")
+        expression_clause, expression_params = expression_sql(expression)
+        if expression_clause:
+            clauses.append(expression_clause)
+            params.extend(expression_params)
+    else:
+        for f in filters:
+            clause, filter_params = filter_clause(f)
+            if clause:
+                clauses.append(clause)
+                params.extend(filter_params)
 
     # Assemble WHERE
     glue = f" {logic.upper()} " if logic.upper() in ("AND", "OR") else " AND "
