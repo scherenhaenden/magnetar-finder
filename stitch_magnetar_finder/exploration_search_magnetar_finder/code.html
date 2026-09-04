@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Magnetar Finder - Search &amp; Exploration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&amp;family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#b9cacb",
+                        "background": "#0d1515",
+                        "primary": "#e1fdff",
+                        "on-primary-container": "#006a71",
+                        "error-container": "#93000a",
+                        "on-tertiary-container": "#725e00",
+                        "surface-container-highest": "#2e3637",
+                        "surface-container": "#192122",
+                        "secondary-fixed": "#d3e4fe",
+                        "primary-fixed-dim": "#00dbe7",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "on-secondary-container": "#a9bad3",
+                        "surface-container-lowest": "#080f10",
+                        "surface-dim": "#0d1515",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#2a3232",
+                        "secondary-container": "#3a4a5f",
+                        "on-primary": "#00363a",
+                        "surface-tint": "#00dbe7",
+                        "primary-fixed": "#74f5ff",
+                        "on-primary-fixed": "#002022",
+                        "surface-container-low": "#151d1e",
+                        "on-tertiary": "#3b2f00",
+                        "on-secondary-fixed": "#0b1c30",
+                        "inverse-primary": "#00696f",
+                        "on-background": "#dce4e4",
+                        "on-primary-fixed-variant": "#004f54",
+                        "tertiary-fixed": "#ffe173",
+                        "outline-variant": "#3a494b",
+                        "inverse-surface": "#dce4e4",
+                        "surface-bright": "#333b3b",
+                        "on-secondary": "#213145",
+                        "error": "#ffb4ab",
+                        "tertiary": "#fff6e4",
+                        "tertiary-container": "#fed83a",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-tertiary-fixed": "#221b00",
+                        "tertiary-fixed-dim": "#e8c423",
+                        "secondary": "#b7c8e1",
+                        "surface-variant": "#2e3637",
+                        "surface": "#0d1515",
+                        "surface-container-high": "#232b2c",
+                        "on-surface": "#dce4e4",
+                        "on-error-container": "#ffdad6",
+                        "outline": "#849495",
+                        "primary-container": "#00f2ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "margin-desktop": "32px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Geist"],
+                        "data-mono": ["JetBrains Mono"],
+                        "display-lg": ["Geist"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "data-mono": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for data tables */
+        .data-scroll::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .data-scroll::-webkit-scrollbar-track {
+            background: #080f10;
+        }
+        .data-scroll::-webkit-scrollbar-thumb {
+            background: #2e3637;
+            border-radius: 4px;
+        }
+        .data-scroll::-webkit-scrollbar-thumb:hover {
+            background: #3a494b;
+        }
+
+        /* Table Row Hover Effect - Cyan Wash */
+        .table-row-hover:hover {
+            background-color: rgba(0, 219, 231, 0.05); /* primary-fixed-dim 5% */
+            cursor: pointer;
+        }
+
+        /* Inner shadow for inputs */
+        .inner-glow {
+            box-shadow: inset 0 1px 3px 0 rgb(0 0 0 / 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-sm min-h-screen flex flex-col md:flex-row antialiased selection:bg-primary-fixed-dim selection:text-on-primary-fixed">
+<!-- JSON Component: SideNavBar -->
+<nav class="hidden md:flex flex-col w-[280px] h-screen border-r border-outline-variant bg-surface-container-lowest fixed left-0 top-0 bottom-0 z-40 overflow-y-auto">
+<!-- Header -->
+<div class="px-6 py-6 border-b border-outline-variant/50">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-10 h-10 rounded bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden">
+<img alt="Researcher Profile" class="w-full h-full object-cover opacity-80" data-alt="A highly detailed avatar or placeholder icon for a scientific researcher. The image should be abstract, geometric, and precise, utilizing a deep space navy and cyan color palette, consistent with a high-end astrophysical dashboard. Lighting should be dramatic and moody." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoDxUqDLCqHWvdZLywQ8cm36Z5fymQIx3m0DEo2eQ8lFLj3EWUPCC1G1C8oGcBWaWp36BzcHDJIue1y44bP1YsErDrtmEBFxpgEfj5ufot-spQ4nbXn5JQK5RyJiBb6lrFJ4VAjJSG6GQ90KnzDOJsVQ5o8KLbWLlL6P--870EjOtbEoIVPI122jxuIXEn7PQ09nKMcgP2sqvI_lFFLfGCruWh61VOVhol3g3BGHMI5N9M11_90Zx-"/>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold tracking-tight text-primary-fixed">Magnetar Finder</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Precision Astrophysics</p>
+</div>
+</div>
+<button class="w-full bg-primary-fixed-dim hover:bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps py-2.5 px-4 rounded transition-colors duration-150 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">add</span>
+                New Analysis
+            </button>
+</div>
+<!-- Main Nav -->
+<div class="flex-1 py-4 px-3 flex flex-col gap-1">
+<!-- Active Tab: Exploration (closest to Search & Exploration) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg border-l-4 border-primary-fixed-dim ring-1 ring-primary-fixed-dim/20 scale-[0.99] transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">query_stats</span>
+<span class="font-body-sm text-body-sm font-medium">Exploration</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 rounded-lg border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">analytics</span>
+<span class="font-body-sm text-body-sm font-medium">Analysis</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 rounded-lg border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">inventory_2</span>
+<span class="font-body-sm text-body-sm font-medium">Archives</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 rounded-lg border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">storage</span>
+<span class="font-body-sm text-body-sm font-medium">Database</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 rounded-lg border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">terminal</span>
+<span class="font-body-sm text-body-sm font-medium">Protocols</span>
+</a>
+</div>
+<!-- Footer Nav -->
+<div class="p-3 border-t border-outline-variant/50">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 rounded border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 rounded border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">help_outline</span>
+<span class="font-body-sm text-body-sm">Support</span>
+</a>
+</div>
+</nav>
+<!-- JSON Component: TopAppBar -->
+<header class="hidden md:flex h-16 w-full border-b border-outline-variant bg-surface-dim/95 backdrop-blur-sm fixed top-0 right-0 left-[280px] z-30 items-center justify-between px-margin-desktop">
+<!-- Navigation Links -->
+<div class="flex items-center gap-6 h-full">
+<a class="h-full flex items-center font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors px-3" href="#">Real-time</a>
+<a class="h-full flex items-center font-label-caps text-label-caps text-primary-fixed border-b-2 border-primary-fixed font-bold opacity-80 transition-opacity px-3" href="#">History</a>
+<a class="h-full flex items-center font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors px-3" href="#">Signals</a>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-4">
+<button class="bg-surface-container-high border border-primary-fixed-dim/30 hover:border-primary-fixed-dim text-primary-fixed font-label-caps text-label-caps py-1.5 px-4 rounded transition-colors duration-150 flex items-center gap-2">
+                Execute Query
+                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+</button>
+<div class="flex items-center gap-1 border-l border-outline-variant pl-4">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded transition-colors">
+<span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded transition-colors">
+<span class="material-symbols-outlined" style="font-size: 20px;">cloud_sync</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded transition-colors">
+<span class="material-symbols-outlined" style="font-size: 20px;">help</span>
+</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant ml-2">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A small circular avatar placeholder image. Geometric and dark." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWWM3lUn5Mrj953Fxm99_SVAZ6lwyRvdB60sEOlmv5Xe3NPbCYTgUzrNQJDgkFrl5fQG4DpGKXvqDpOCQmhKDboQubFPqqGhtZHzbAopHdxhm8dArI_cfiwaa8JuE8iiD7K8jF89mjgGwh_CjrxhYegzJX9jl1KTc-7L88zLyy5PyxnaA5BhCEqzjKvOxKCMbilt81tIUyGP2P-UsHscFkWkgfzUMjcS-2fH5H4k-zznmi7W_2gZox"/>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 md:ml-[280px] md:mt-16 bg-surface flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
+<!-- Left Sidebar: Database Filters -->
+<aside class="w-full md:w-64 border-r border-outline-variant bg-surface-container-low flex flex-col overflow-y-auto shrink-0 hidden lg:flex">
+<div class="p-4 border-b border-outline-variant/50 sticky top-0 bg-surface-container-low/90 backdrop-blur z-10">
+<h2 class="font-label-caps text-label-caps text-on-surface mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">database</span>
+                    ACTIVE DATABASES
+                </h2>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-2 text-on-surface-variant" style="font-size: 16px;">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded text-data-mono font-data-mono text-on-surface py-1.5 pl-8 pr-2 focus:ring-1 focus:ring-primary-fixed-dim focus:border-primary-fixed-dim placeholder-on-surface-variant/50 transition-all inner-glow" placeholder="Filter sources..." type="text"/>
+</div>
+</div>
+<div class="p-2 flex flex-col gap-1">
+<!-- DB Source Item -->
+<label class="flex items-center gap-3 p-2 rounded hover:bg-surface-container-highest cursor-pointer group transition-colors">
+<div class="relative flex items-center">
+<input checked="" class="peer sr-only" type="checkbox"/>
+<div class="w-4 h-4 rounded-sm border border-outline-variant bg-surface-container-lowest peer-checked:bg-primary-fixed-dim peer-checked:border-primary-fixed-dim flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-on-primary-fixed opacity-0 peer-checked:opacity-100 transition-opacity" style="font-size: 12px; font-weight: bold;">check</span>
+</div>
+</div>
+<div class="flex-1 overflow-hidden">
+<div class="font-data-mono text-data-mono text-on-surface truncate group-hover:text-primary-fixed transition-colors">MGT_SGR_1806_20</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5 uppercase tracking-wider">SQLite • 2.4TB</div>
+</div>
+</label>
+<!-- DB Source Item -->
+<label class="flex items-center gap-3 p-2 rounded hover:bg-surface-container-highest cursor-pointer group transition-colors">
+<div class="relative flex items-center">
+<input checked="" class="peer sr-only" type="checkbox"/>
+<div class="w-4 h-4 rounded-sm border border-outline-variant bg-surface-container-lowest peer-checked:bg-primary-fixed-dim peer-checked:border-primary-fixed-dim flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-on-primary-fixed opacity-0 peer-checked:opacity-100 transition-opacity" style="font-size: 12px; font-weight: bold;">check</span>
+</div>
+</div>
+<div class="flex-1 overflow-hidden">
+<div class="font-data-mono text-data-mono text-on-surface truncate group-hover:text-primary-fixed transition-colors">AXP_1E_1048.1_5937</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5 uppercase tracking-wider">SQLite • 890GB</div>
+</div>
+</label>
+<!-- DB Source Item -->
+<label class="flex items-center gap-3 p-2 rounded hover:bg-surface-container-highest cursor-pointer group transition-colors">
+<div class="relative flex items-center">
+<input class="peer sr-only" type="checkbox"/>
+<div class="w-4 h-4 rounded-sm border border-outline-variant bg-surface-container-lowest peer-checked:bg-primary-fixed-dim peer-checked:border-primary-fixed-dim flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-on-primary-fixed opacity-0 peer-checked:opacity-100 transition-opacity" style="font-size: 12px; font-weight: bold;">check</span>
+</div>
+</div>
+<div class="flex-1 overflow-hidden">
+<div class="font-data-mono text-data-mono text-on-surface-variant truncate group-hover:text-on-surface transition-colors">SGR_0526_66_ARCHIVE</div>
+<div class="text-[10px] text-on-surface-variant/70 mt-0.5 uppercase tracking-wider">SQLite • Offline</div>
+</div>
+</label>
+</div>
+<div class="mt-auto p-4 border-t border-outline-variant/50">
+<button class="w-full bg-transparent border border-outline-variant hover:border-primary-fixed hover:text-primary-fixed text-on-surface-variant font-label-caps text-label-caps py-2 rounded transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">add_link</span>
+                    Connect Database
+                </button>
+</div>
+</aside>
+<!-- Right Content Area -->
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- Search & Filter Panel -->
+<div class="p-6 border-b border-outline-variant bg-surface shrink-0">
+<!-- Query Input Area -->
+<div class="bg-surface-container border border-outline-variant rounded-lg p-1 flex flex-col focus-within:border-primary-fixed-dim/50 focus-within:ring-1 focus-within:ring-primary-fixed-dim/20 transition-all">
+<!-- Search Chips (Modular Inputs) -->
+<div class="flex flex-wrap gap-2 p-2">
+<!-- Chip 1 -->
+<div class="flex items-center bg-surface-container-highest border border-outline-variant rounded px-2 py-1 gap-2 group">
+<span class="font-label-caps text-[9px] text-on-surface-variant uppercase">Operator</span>
+<span class="font-data-mono text-[11px] text-primary-fixed">CONTAINS</span>
+<span class="text-on-surface font-body-sm text-[13px] border-l border-outline-variant pl-2 ml-1">"gamma ray burst"</span>
+<button class="ml-1 text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined" style="font-size: 14px;">close</span>
+</button>
+</div>
+<!-- Chip 2 -->
+<div class="flex items-center bg-surface-container-highest border border-outline-variant rounded px-2 py-1 gap-2 group">
+<span class="font-label-caps text-[9px] text-on-surface-variant uppercase">Operator</span>
+<span class="font-data-mono text-[11px] text-error">NOT CONTAINS</span>
+<span class="text-on-surface font-body-sm text-[13px] border-l border-outline-variant pl-2 ml-1">"solar flare"</span>
+<button class="ml-1 text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined" style="font-size: 14px;">close</span>
+</button>
+</div>
+<!-- Active Input -->
+<input class="flex-1 min-w-[200px] bg-transparent border-none text-on-surface font-body-sm focus:ring-0 placeholder-on-surface-variant/50 p-1" placeholder="Add query parameters..." type="text"/>
+</div>
+<!-- Filter Bar -->
+<div class="flex flex-wrap items-center justify-between border-t border-outline-variant/50 p-2 gap-4">
+<div class="flex items-center gap-3">
+<!-- Date Range Picker Mockup -->
+<button class="flex items-center gap-2 bg-surface-container-lowest border border-outline-variant hover:border-primary-fixed-dim/50 rounded px-3 py-1.5 transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-size: 16px;">calendar_month</span>
+<span class="font-data-mono text-data-mono text-on-surface">2023.01.01 - 2023.12.31</span>
+</button>
+<!-- Logic Toggles -->
+<div class="flex rounded bg-surface-container-lowest border border-outline-variant overflow-hidden">
+<button class="px-3 py-1.5 font-label-caps text-label-caps bg-primary-fixed/10 text-primary-fixed border-r border-outline-variant">AND</button>
+<button class="px-3 py-1.5 font-label-caps text-label-caps text-on-surface-variant hover:bg-surface-container-highest transition-colors">OR</button>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-on-surface-variant hover:text-on-surface font-label-caps text-[10px] uppercase tracking-wider px-2 py-1">Clear Filters</button>
+<button class="bg-primary-fixed-dim hover:bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps py-1.5 px-4 rounded transition-colors flex items-center gap-2 shadow-[0_0_10px_rgba(0,219,231,0.2)]">
+<span class="material-symbols-outlined" style="font-size: 16px;">search</span>
+                                SEARCH
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Data Table Section -->
+<div class="flex-1 bg-surface-container-lowest relative overflow-hidden flex flex-col">
+<!-- Table Header Sticky -->
+<div class="grid grid-cols-12 gap-4 px-6 py-3 border-b border-outline-variant bg-surface-dim/90 backdrop-blur z-20 font-label-caps text-label-caps text-on-surface-variant sticky top-0">
+<div class="col-span-1 flex items-center gap-2 cursor-pointer hover:text-primary-fixed transition-colors">
+                        STATUS <span class="material-symbols-outlined" style="font-size: 14px;">arrow_drop_down</span>
+</div>
+<div class="col-span-2 flex items-center gap-2 cursor-pointer hover:text-primary-fixed transition-colors">
+                        SOURCE DB
+                    </div>
+<div class="col-span-2 flex items-center gap-2 cursor-pointer hover:text-primary-fixed transition-colors">
+                        TIMESTAMP (UTC)
+                    </div>
+<div class="col-span-4">CONTENT PREVIEW</div>
+<div class="col-span-3 text-right">ACTIONS</div>
+</div>
+<!-- Table Body Scrollable -->
+<div class="flex-1 overflow-y-auto data-scroll pb-20">
+<!-- Row 1 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-3 border-b border-outline-variant/30 table-row-hover items-center transition-colors group">
+<div class="col-span-1 flex items-center">
+<div class="w-2 h-2 rounded-full bg-primary-fixed shadow-[0_0_8px_rgba(116,245,255,0.8)]"></div>
+</div>
+<div class="col-span-2 font-data-mono text-[12px] text-on-surface truncate">MGT_SGR_1806_20</div>
+<div class="col-span-2 font-data-mono text-[12px] text-on-surface-variant">2023-10-12 04:22:19</div>
+<div class="col-span-4 font-body-sm text-body-sm text-on-surface truncate pr-4 text-opacity-90">
+                            Detection of intense gamma ray burst correlating with magnetic anomaly...
+                        </div>
+<div class="col-span-3 flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="px-3 py-1 font-label-caps text-[10px] text-on-surface-variant hover:text-on-surface border border-transparent hover:border-outline-variant rounded transition-colors">
+                                VIEW ANTECEDENTS
+                            </button>
+<button class="px-3 py-1 font-label-caps text-[10px] text-primary-fixed border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 rounded transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 12px;">bookmark_add</span>
+                                SAVE
+                            </button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-3 border-b border-outline-variant/30 table-row-hover items-center transition-colors group bg-surface-container-highest/20">
+<div class="col-span-1 flex items-center">
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+</div>
+<div class="col-span-2 font-data-mono text-[12px] text-on-surface truncate">AXP_1E_1048.1</div>
+<div class="col-span-2 font-data-mono text-[12px] text-on-surface-variant">2023-10-11 18:45:02</div>
+<div class="col-span-4 font-body-sm text-body-sm text-on-surface truncate pr-4 text-opacity-90">
+                            Minor fluctuation recorded in lower band frequencies. Below threshold for standard...
+                        </div>
+<div class="col-span-3 flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="px-3 py-1 font-label-caps text-[10px] text-on-surface-variant hover:text-on-surface border border-transparent hover:border-outline-variant rounded transition-colors">
+                                VIEW ANTECEDENTS
+                            </button>
+<button class="px-3 py-1 font-label-caps text-[10px] text-primary-fixed border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 rounded transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 12px;">bookmark_add</span>
+                                SAVE
+                            </button>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-3 border-b border-outline-variant/30 table-row-hover items-center transition-colors group">
+<div class="col-span-1 flex items-center">
+<div class="w-2 h-2 rounded-full bg-primary-fixed shadow-[0_0_8px_rgba(116,245,255,0.8)]"></div>
+</div>
+<div class="col-span-2 font-data-mono text-[12px] text-on-surface truncate">MGT_SGR_1806_20</div>
+<div class="col-span-2 font-data-mono text-[12px] text-on-surface-variant">2023-10-10 09:12:44</div>
+<div class="col-span-4 font-body-sm text-body-sm text-on-surface truncate pr-4 text-opacity-90">
+                            Pre-burst harmonic resonance observed. Data aligns with theoretical model A-4.
+                        </div>
+<div class="col-span-3 flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="px-3 py-1 font-label-caps text-[10px] text-on-surface-variant hover:text-on-surface border border-transparent hover:border-outline-variant rounded transition-colors">
+                                VIEW ANTECEDENTS
+                            </button>
+<button class="px-3 py-1 font-label-caps text-[10px] text-primary-fixed border border-primary-fixed-dim/50 hover:bg-primary-fixed/10 rounded transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 12px;">bookmark_add</span>
+                                SAVE
+                            </button>
+</div>
+</div>
+</div>
+<!-- Footer Status Bar -->
+<div class="absolute bottom-0 left-0 right-0 h-10 border-t border-outline-variant bg-surface-container flex items-center justify-between px-6 font-data-mono text-[11px] text-on-surface-variant z-20">
+<div>Showing 1 - 3 of 1,402 results</div>
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-primary-fixed"></span> Query Execution: 42ms</span>
+<span>Server: Node Alpha</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

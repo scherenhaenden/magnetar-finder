@@ -77,9 +77,22 @@ function switchView(viewId) {
   document.querySelectorAll('.view').forEach(v => { v.classList.remove('active'); v.classList.add('hidden'); });
   const target = document.getElementById(`view-${viewId}`);
   if (target) { target.classList.remove('hidden'); target.classList.add('active'); }
+
   document.querySelectorAll('.nav-link').forEach(a => {
     a.classList.toggle('active', a.dataset.view === viewId);
   });
+
+  // Dynamically update TopBar tabs active state
+  document.querySelectorAll('.top-tab-link').forEach(a => {
+    const isActive = a.dataset.view === viewId;
+    a.classList.toggle('text-primary-fixed', isActive);
+    a.classList.toggle('border-b-2', isActive);
+    a.classList.toggle('border-primary-fixed', isActive);
+    a.classList.toggle('font-bold', isActive);
+    a.classList.toggle('opacity-80', isActive);
+    a.classList.toggle('text-on-surface-variant', !isActive);
+  });
+
   // Trigger data loads
   if (viewId === 'archives') loadArchives();
   if (viewId === 'databases') renderDbCards();
@@ -87,7 +100,18 @@ function switchView(viewId) {
 }
 
 document.querySelectorAll('.nav-link').forEach(a => {
+  if (a.id !== 'nav-support') {
+    a.addEventListener('click', e => { e.preventDefault(); switchView(a.dataset.view); });
+  }
+});
+
+document.querySelectorAll('.top-tab-link').forEach(a => {
   a.addEventListener('click', e => { e.preventDefault(); switchView(a.dataset.view); });
+});
+
+document.getElementById('nav-support')?.addEventListener('click', e => {
+  e.preventDefault();
+  toast('Support channel online — Status: stable', 'success');
 });
 
 // ── Databases ──────────────────────────────────────────────────────────────────

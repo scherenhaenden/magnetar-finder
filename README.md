@@ -66,6 +66,34 @@ bash build/run.sh --port 8080
 bash build/run.sh --no-browser
 ```
 
+### Linux desktop executable
+
+The packaged Linux build is written to `builds/linux/magnetar-finder`. Build it
+from the project root with the project virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt pyinstaller
+mkdir -p builds/linux builds/.pyinstaller
+pyinstaller --noconfirm --clean --onefile \
+  --name magnetar-finder \
+  --distpath "$PWD/builds/linux" \
+  --workpath "$PWD/builds/.pyinstaller/work" \
+  --specpath "$PWD/builds/.pyinstaller" \
+  --add-data "$PWD/build/angular:angular_assets" \
+  "$PWD/desktop_launcher.py"
+```
+
+Run it with:
+
+```bash
+./builds/linux/magnetar-finder
+```
+
+The executable targets Linux x86-64 and requires a compatible Linux system;
+the build machine's Python runtime is bundled into the executable.
+
 ### Manual (if you prefer)
 ```bash
 python3 -m venv .venv

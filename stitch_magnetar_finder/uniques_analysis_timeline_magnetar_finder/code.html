@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analysis &amp; Uniques - Magnetar Finder</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface-variant": "#b9cacb",
+                      "background": "#0d1515",
+                      "primary": "#e1fdff",
+                      "on-primary-container": "#006a71",
+                      "error-container": "#93000a",
+                      "on-tertiary-container": "#725e00",
+                      "surface-container-highest": "#2e3637",
+                      "surface-container": "#192122",
+                      "secondary-fixed": "#d3e4fe",
+                      "primary-fixed-dim": "#00dbe7",
+                      "on-tertiary-fixed-variant": "#554500",
+                      "on-secondary-container": "#a9bad3",
+                      "surface-container-lowest": "#080f10",
+                      "surface-dim": "#0d1515",
+                      "on-error": "#690005",
+                      "inverse-on-surface": "#2a3232",
+                      "secondary-container": "#3a4a5f",
+                      "on-primary": "#00363a",
+                      "surface-tint": "#00dbe7",
+                      "primary-fixed": "#74f5ff",
+                      "on-primary-fixed": "#002022",
+                      "surface-container-low": "#151d1e",
+                      "on-tertiary": "#3b2f00",
+                      "on-secondary-fixed": "#0b1c30",
+                      "inverse-primary": "#00696f",
+                      "on-background": "#dce4e4",
+                      "on-primary-fixed-variant": "#004f54",
+                      "tertiary-fixed": "#ffe173",
+                      "outline-variant": "#3a494b",
+                      "inverse-surface": "#dce4e4",
+                      "surface-bright": "#333b3b",
+                      "on-secondary": "#213145",
+                      "error": "#ffb4ab",
+                      "tertiary": "#fff6e4",
+                      "tertiary-container": "#fed83a",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "on-tertiary-fixed": "#221b00",
+                      "tertiary-fixed-dim": "#e8c423",
+                      "secondary": "#b7c8e1",
+                      "surface-variant": "#2e3637",
+                      "surface": "#0d1515",
+                      "surface-container-high": "#232b2c",
+                      "on-surface": "#dce4e4",
+                      "on-error-container": "#ffdad6",
+                      "outline": "#849495",
+                      "primary-container": "#00f2ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "margin-mobile": "16px",
+                      "unit": "4px",
+                      "margin-desktop": "32px",
+                      "container-max": "1440px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "data-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "data-mono": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Tech-Industrial Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #080f10; }
+        ::-webkit-scrollbar-thumb { background: #3a494b; border-radius: 0px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00dbe7; }
+
+        /* Custom utilities for high-precision aesthetic */
+        .table-row-hover:hover { background-color: rgba(0, 219, 231, 0.05); border-left-color: #00dbe7; }
+        .table-row-active { background-color: rgba(0, 219, 231, 0.1); border-left-color: #00dbe7; }
+        .tech-border { border: 1px solid #3a494b; }
+        .glow-active { box-shadow: inset 0 0 12px rgba(0, 219, 231, 0.15); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-sm text-body-sm antialiased overflow-hidden">
+<!--
+        =======================================================================
+        SHARED COMPONENT: SideNavBar
+        Semantic Match: "Analysis" is strictly matched to the current page intent.
+        =======================================================================
+    -->
+<nav class="fixed left-0 top-0 bottom-0 z-40 overflow-y-auto w-[280px] h-screen flex flex-col border-r border-outline-variant bg-surface-container-lowest text-primary-fixed-dim dark:bg-surface-container-lowest dark:text-primary-fixed-dim">
+<!-- Header -->
+<div class="p-6 border-b border-outline-variant flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-DEFAULT bg-surface-container-high border border-outline-variant overflow-hidden flex items-center justify-center shrink-0">
+<img class="w-full h-full object-cover" data-alt="A highly detailed avatar of an astrophysics researcher in a dark, high-tech environment, illuminated by cool blue screen light, stylized as a digital portrait with intense contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3oMdtiLz_gKUStTW1xPHWUPEfMqSGgbdHxQ14yfPSZMrP5SCDTL-wV2Lizr-Renbm631_WkFmMgivgKSzrUX_gt6-Es5GJKpIV3G2V0PeZf8Rw4Rk2_dHklmzZIGij5UdhysiyMRD8NQZvlyw2hOcIloQ9al3Yf_AP9uI6cyg5dlrLmjIqOfW6wNXMpW91tw1QyNKDTkijiG-87VGlut2wAlKAKIdNJcsSLDiUSvp0wz0qVi3RV0w"/>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold tracking-tight text-primary-fixed dark:text-primary-fixed">Magnetar Finder</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Precision Astrophysics</p>
+</div>
+</div>
+<button class="w-full py-2 px-4 bg-primary-fixed-dim text-on-primary-fixed font-label-caps text-label-caps rounded-DEFAULT hover:bg-primary-fixed transition-colors flex items-center justify-center gap-2 mt-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                New Analysis
+            </button>
+</div>
+<!-- Main Navigation -->
+<div class="flex-1 py-4 flex flex-col gap-1 px-3">
+<!-- Inactive: Exploration -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors hover:bg-surface-container-highest transition-all duration-150 rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="font-body-sm text-body-sm">Exploration</span>
+</a>
+<!-- ACTIVE: Analysis -->
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg border-l-4 border-primary-fixed-dim ring-1 ring-primary-fixed-dim/20 scale-[0.99] transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-body-sm text-body-sm font-semibold">Analysis</span>
+</a>
+<!-- Inactive: Archives -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors hover:bg-surface-container-highest transition-all duration-150 rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-sm text-body-sm">Archives</span>
+</a>
+<!-- Inactive: Database -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors hover:bg-surface-container-highest transition-all duration-150 rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined">storage</span>
+<span class="font-body-sm text-body-sm">Database</span>
+</a>
+<!-- Inactive: Protocols -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors hover:bg-surface-container-highest transition-all duration-150 rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="font-body-sm text-body-sm">Protocols</span>
+</a>
+</div>
+<!-- Footer Navigation -->
+<div class="p-4 border-t border-outline-variant flex flex-col gap-1 px-3">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors hover:bg-surface-container-highest transition-all duration-150 rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors hover:bg-surface-container-highest transition-all duration-150 rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-body-sm text-body-sm">Support</span>
+</a>
+</div>
+</nav>
+<!--
+        =======================================================================
+        SHARED COMPONENT: TopAppBar
+        Semantic Match: Secondary nav shell. None strictly active for this deeper tool.
+        =======================================================================
+    -->
+<header class="fixed top-0 right-0 left-[280px] z-30 flex items-center justify-between px-margin-desktop h-16 w-full border-b border-outline-variant bg-surface-dim/95 backdrop-blur-sm dark:bg-surface-dim text-primary-fixed dark:text-primary-fixed">
+<!-- Left: Search/Nav -->
+<div class="flex items-center gap-6">
+<!-- Brand missing from JSON config in this section but part of layout rules usually. Omitting to follow strict layout string. -->
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-DEFAULT py-1.5 pl-9 pr-3 font-data-mono text-data-mono text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary-fixed-dim focus:ring-1 focus:ring-primary-fixed-dim outline-none transition-all" placeholder="Query Dataset..." type="text"/>
+</div>
+<nav class="flex items-center gap-2">
+<a class="px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors font-label-caps text-label-caps" href="#">Real-time</a>
+<a class="px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors font-label-caps text-label-caps" href="#">History</a>
+<a class="px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors font-label-caps text-label-caps" href="#">Signals</a>
+</nav>
+</div>
+<!-- Right: Actions -->
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined text-[20px]">cloud_sync</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+<div class="w-px h-6 bg-outline-variant mx-2"></div>
+<button class="px-4 py-1.5 border border-primary-fixed-dim text-primary-fixed-dim hover:bg-primary-fixed-dim/10 rounded-DEFAULT font-label-caps text-label-caps transition-all">
+                Execute Query
+            </button>
+</div>
+</header>
+<!--
+        =======================================================================
+        MAIN CANVAS
+        =======================================================================
+    -->
+<main class="ml-[280px] pt-16 h-screen overflow-hidden flex flex-col">
+<!-- Page Header & Global Controls -->
+<div class="px-margin-desktop py-6 border-b border-outline-variant bg-surface-container-lowest shrink-0">
+<div class="flex items-end justify-between">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-1">Uniques &amp; Frequencies</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Isolate repeating patterns and chronological clusters within the dataset.</p>
+</div>
+<!-- Grouping Control -->
+<div class="flex items-center gap-3">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Group by Field:</label>
+<div class="relative">
+<select class="appearance-none bg-surface-container tech-border rounded-DEFAULT py-1.5 pl-3 pr-8 font-data-mono text-data-mono text-primary-fixed-dim focus:outline-none focus:border-primary-fixed cursor-pointer">
+<option selected="" value="url">Source_URL</option>
+<option value="ip">Origin_IP</option>
+<option value="signature">Spectral_Signature</option>
+<option value="magnitude">Magnitude_Class</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-primary-fixed-dim pointer-events-none text-[16px]">arrow_drop_down</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="flex-1 p-margin-desktop overflow-hidden flex gap-6">
+<!-- LEFT COLUMN: Data Table (Uniques List) -->
+<div class="w-1/3 flex flex-col bg-surface-container tech-border rounded-lg overflow-hidden relative">
+<!-- Subtle Top Glow indicator -->
+<div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary-fixed-dim/50 to-transparent"></div>
+<div class="p-4 border-b border-outline-variant bg-surface-container-highest flex justify-between items-center shrink-0">
+<h3 class="font-label-caps text-label-caps text-on-surface">Extracted Values</h3>
+<span class="font-data-mono text-[11px] text-on-surface-variant">Total Unique: 1,402</span>
+</div>
+<div class="flex-1 overflow-y-auto bg-surface-container-lowest">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface-container/95 backdrop-blur-sm z-10 border-b border-outline-variant">
+<tr>
+<th class="py-2 px-4 font-label-caps text-[10px] text-on-surface-variant w-3/5">Value</th>
+<th class="py-2 px-4 font-label-caps text-[10px] text-on-surface-variant text-right">Count</th>
+</tr>
+</thead>
+<tbody class="font-data-mono text-data-mono divide-y divide-outline-variant/30">
+<!-- Active Row -->
+<tr class="table-row-active border-l-[3px] cursor-pointer transition-colors group">
+<td class="py-3 px-4 truncate max-w-[150px] text-primary-fixed-dim" title="magnetar-flux-anomaly-alpha.gov">
+                                    magnetar-flux-anoma...
+                                </td>
+<td class="py-3 px-4 text-right text-on-surface">
+                                    42,109
+                                </td>
+</tr>
+<!-- Inactive Rows -->
+<tr class="table-row-hover border-l-[3px] border-transparent cursor-pointer transition-colors text-on-surface-variant">
+<td class="py-3 px-4 truncate max-w-[150px]">gamma-burst-repo.edu</td>
+<td class="py-3 px-4 text-right">38,552</td>
+</tr>
+<tr class="table-row-hover border-l-[3px] border-transparent cursor-pointer transition-colors text-on-surface-variant">
+<td class="py-3 px-4 truncate max-w-[150px]">deep-space-telemetry.net</td>
+<td class="py-3 px-4 text-right">15,901</td>
+</tr>
+<tr class="table-row-hover border-l-[3px] border-transparent cursor-pointer transition-colors text-on-surface-variant">
+<td class="py-3 px-4 truncate max-w-[150px]">neutron-star-metrics.org</td>
+<td class="py-3 px-4 text-right">9,440</td>
+</tr>
+<tr class="table-row-hover border-l-[3px] border-transparent cursor-pointer transition-colors text-on-surface-variant">
+<td class="py-3 px-4 truncate max-w-[150px]">xray-pulsar-node-7.mil</td>
+<td class="py-3 px-4 text-right">8,211</td>
+</tr>
+<tr class="table-row-hover border-l-[3px] border-transparent cursor-pointer transition-colors text-on-surface-variant">
+<td class="py-3 px-4 truncate max-w-[150px]">unknown-signal-cluster.xyz</td>
+<td class="py-3 px-4 text-right">4,105</td>
+</tr>
+<tr class="table-row-hover border-l-[3px] border-transparent cursor-pointer transition-colors text-on-surface-variant">
+<td class="py-3 px-4 truncate max-w-[150px]">stellar-wind-analyzer.int</td>
+<td class="py-3 px-4 text-right">1,200</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- RIGHT COLUMN: Detail Stage (Bento Stack) -->
+<div class="w-2/3 flex flex-col gap-6">
+<!-- Top Detail Panel: Visualization & Actions -->
+<div class="bg-surface-container tech-border rounded-lg p-6 flex flex-col gap-6 shrink-0 relative overflow-hidden glow-active">
+<div class="flex justify-between items-start">
+<div>
+<div class="font-label-caps text-label-caps text-primary-fixed-dim mb-1">Selected Value</div>
+<div class="font-data-mono text-headline-md text-on-surface">magnetar-flux-anomaly-alpha.gov</div>
+</div>
+<!-- CTA -->
+<button class="px-4 py-2 bg-transparent border border-primary-fixed-dim text-primary-fixed-dim hover:bg-primary-fixed-dim hover:text-on-primary-fixed transition-all rounded-DEFAULT font-label-caps text-label-caps flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">edit_note</span>
+                            Link to Notes
+                        </button>
+</div>
+<!-- Frequency Visualization (Segmented Progress/Bars) -->
+<div class="pt-4 border-t border-outline-variant">
+<div class="flex justify-between text-[11px] font-data-mono text-on-surface-variant mb-2">
+<span>Frequency Distribution (30 Days)</span>
+<span>Peak: 2,450/day</span>
+</div>
+<!-- Abstract Bar Chart built with flex -->
+<div class="flex items-end gap-1 h-16 w-full opacity-80">
+<!-- Simulated data bars -->
+<div class="flex-1 bg-primary-fixed-dim/20 hover:bg-primary-fixed-dim/50 transition-colors h-[10%]"></div>
+<div class="flex-1 bg-primary-fixed-dim/20 hover:bg-primary-fixed-dim/50 transition-colors h-[15%]"></div>
+<div class="flex-1 bg-primary-fixed-dim/30 hover:bg-primary-fixed-dim/50 transition-colors h-[12%]"></div>
+<div class="flex-1 bg-primary-fixed-dim/20 hover:bg-primary-fixed-dim/50 transition-colors h-[8%]"></div>
+<div class="flex-1 bg-primary-fixed-dim/40 hover:bg-primary-fixed-dim/50 transition-colors h-[30%]"></div>
+<div class="flex-1 bg-primary-fixed-dim/60 hover:bg-primary-fixed-dim transition-colors h-[60%]"></div>
+<div class="flex-1 bg-primary-fixed-dim/80 hover:bg-primary-fixed-dim transition-colors h-[90%] relative group">
+<!-- Tooltip placeholder -->
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface text-[10px] font-data-mono px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">Peak Anomaly</div>
+</div>
+<div class="flex-1 bg-primary-fixed-dim/90 hover:bg-primary-fixed-dim transition-colors h-[100%]"></div>
+<div class="flex-1 bg-primary-fixed-dim/50 hover:bg-primary-fixed-dim/70 transition-colors h-[45%]"></div>
+<div class="flex-1 bg-primary-fixed-dim/30 hover:bg-primary-fixed-dim/50 transition-colors h-[25%]"></div>
+<div class="flex-1 bg-primary-fixed-dim/20 hover:bg-primary-fixed-dim/50 transition-colors h-[15%]"></div>
+<div class="flex-1 bg-primary-fixed-dim/20 hover:bg-primary-fixed-dim/50 transition-colors h-[10%]"></div>
+</div>
+</div>
+</div>
+<!-- Bottom Panels: Split 50/50 -->
+<div class="flex gap-6 flex-1 min-h-0">
+<!-- Chronological Timeline -->
+<div class="flex-1 bg-surface-container tech-border rounded-lg flex flex-col overflow-hidden">
+<div class="p-4 border-b border-outline-variant bg-surface-container-highest shrink-0">
+<h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">history</span>
+                                Chronological Events
+                            </h3>
+</div>
+<div class="flex-1 overflow-y-auto p-6 relative">
+<!-- Timeline Track -->
+<div class="absolute left-[39px] top-6 bottom-6 w-px bg-outline-variant/50"></div>
+<div class="flex flex-col gap-6">
+<!-- Timeline Item -->
+<div class="flex items-start gap-4 relative z-10 group">
+<div class="w-10 pt-1 shrink-0 text-right">
+<span class="font-data-mono text-[10px] text-on-surface-variant">14:02</span>
+</div>
+<!-- Node (Diamond) -->
+<div class="w-3 h-3 mt-1.5 shrink-0 rotate-45 bg-surface border border-primary-fixed-dim group-hover:bg-primary-fixed-dim transition-colors shadow-[0_0_8px_rgba(0,219,231,0.2)]"></div>
+<div class="flex-1 bg-surface-container-low border border-outline-variant/50 p-3 rounded-DEFAULT hover:border-primary-fixed-dim/50 transition-colors">
+<div class="font-data-mono text-xs text-primary-fixed-dim mb-1">Burst_Gamma_Ray_DETECT</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">Intensity spike recorded crossing threshold omega. Cross-referenced with orbital station 4.</div>
+</div>
+</div>
+<!-- Timeline Item -->
+<div class="flex items-start gap-4 relative z-10 group">
+<div class="w-10 pt-1 shrink-0 text-right">
+<span class="font-data-mono text-[10px] text-on-surface-variant">11:45</span>
+</div>
+<div class="w-3 h-3 mt-1.5 shrink-0 rotate-45 bg-primary-fixed-dim shadow-[0_0_8px_rgba(0,219,231,0.5)]"></div>
+<div class="flex-1 bg-surface-container-high border border-primary-fixed-dim/30 p-3 rounded-DEFAULT">
+<div class="font-data-mono text-xs text-on-surface mb-1">Magnetic_Flux_Warning</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">Automated system triggered anomalous pattern recognition protocol.</div>
+</div>
+</div>
+<!-- Timeline Item -->
+<div class="flex items-start gap-4 relative z-10 group">
+<div class="w-10 pt-1 shrink-0 text-right">
+<span class="font-data-mono text-[10px] text-on-surface-variant">08:12</span>
+</div>
+<div class="w-3 h-3 mt-1.5 shrink-0 rotate-45 bg-surface border border-outline-variant group-hover:border-primary-fixed-dim transition-colors"></div>
+<div class="flex-1 bg-surface-container-low border border-outline-variant/50 p-3 rounded-DEFAULT hover:border-primary-fixed-dim/50 transition-colors">
+<div class="font-data-mono text-xs text-on-surface-variant mb-1">Routine_Telemetry_Sync</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant/70">Standard handshake completed. No anomalies prior to 11:45 event horizon.</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Notes Attachment Interface -->
+<div class="flex-1 bg-surface-container tech-border rounded-lg flex flex-col overflow-hidden">
+<div class="p-4 border-b border-outline-variant bg-surface-container-highest shrink-0">
+<h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">sticky_note_2</span>
+                                Analytical Notes
+                            </h3>
+</div>
+<div class="p-4 flex-1 flex flex-col bg-surface-container-lowest">
+<div class="mb-4">
+<label class="font-label-caps text-[10px] text-on-surface-variant block mb-2">Target Group</label>
+<div class="px-3 py-1.5 bg-surface border border-outline-variant rounded-DEFAULT inline-flex items-center gap-2 font-data-mono text-xs text-primary-fixed-dim">
+                                    magnetar-flux-anomaly-alpha.gov
+                                    <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-error transition-colors">close</span>
+</div>
+</div>
+<textarea class="flex-1 w-full bg-surface-container border border-outline-variant rounded-DEFAULT p-3 font-body-sm text-sm text-on-surface placeholder:text-on-surface-variant/40 resize-none focus:border-primary-fixed-dim focus:ring-1 focus:ring-primary-fixed-dim outline-none mb-4" placeholder="Enter observations regarding this frequency cluster. Use markdown for structuring..."></textarea>
+<div class="flex justify-end gap-3 shrink-0">
+<button class="px-4 py-2 text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps transition-colors">Cancel</button>
+<button class="px-5 py-2 bg-primary-fixed-dim text-on-primary-fixed font-label-caps text-label-caps rounded-DEFAULT hover:bg-primary-fixed transition-colors shadow-[0_0_15px_rgba(0,219,231,0.2)]">Save Note</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
