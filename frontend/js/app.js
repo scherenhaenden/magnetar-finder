@@ -1313,6 +1313,21 @@ function renderMatchAnalysis() {
     return;
   }
 
+  // Analysis rows are deliberately transient. While a saved query is waiting
+  // for its full analysis dataset to arrive, do not overwrite the field the
+  // user selected previously with the empty-state fallback.
+  if (!rows.length) {
+    const savedField = State.analysisField;
+    fieldSelect.innerHTML = savedField
+      ? `<option value="${escapeHtml(savedField)}">${escapeHtml(savedField)}</option>`
+      : '<option value="">Select a field…</option>';
+    fieldSelect.value = savedField || '';
+    summary.innerHTML = '';
+    renderAnalysisBars(frequency, [], 'Run the query to analyse its matches.');
+    renderAnalysisBars(sources, [], 'Run the query to analyse its matches.');
+    return;
+  }
+
   const fields = analysisFields(rows);
   const selectedField = fields.includes(State.analysisField) ? State.analysisField : (fields[0] || '');
   State.analysisField = selectedField;
